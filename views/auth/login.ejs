@@ -1,0 +1,17 @@
+<%- include('../partials/header') %>
+
+<section class="auth-form">
+  <h2>Đăng nhập</h2>
+  <form action="/auth/login" method="POST">
+    <label>Email</label>
+    <input type="email" name="email" required>
+
+    <label>Mật khẩu</label>
+    <input type="password" name="password" required>
+
+    <button type="submit" class="btn">Đăng nhập</button>
+  </form>
+  <p>Chưa có tài khoản? <a href="/auth/register">Đăng ký ngay</a></p>
+</section>
+
+<%- include('../partials/footer') %>

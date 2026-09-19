@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="logo"><span>e</span>lectroshop</a>
+      <nav>
+        <a href="/products">Sản phẩm</a>
+        <a href="/cart">Giỏ hàng <b class="cart-count"><%= cartCount || 0 %></b></a>
+        <% if (currentUser) { %>
+          <a href="/orders">Đơn hàng</a>
+          <% if (currentUser.role === 'admin') { %><a href="/admin">Quản trị</a><% } %>
+          <span class="welcome">Xin chào, <%= currentUser.full_name %></span>
+          <a href="/auth/logout">Đăng xuất</a>
+        <% } else { %>
+          <a href="/auth/login">Đăng nhập</a>
+          <a href="/auth/register">Đăng ký</a>
+        <% } %>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <% if (success && success.length) { %>
+      <div class="alert alert-success"><%= success[0] %></div>
+    <% } %>
+    <% if (error && error.length) { %>
+      <div class="alert alert-error"><%= error[0] %></div>
+    <% } %>

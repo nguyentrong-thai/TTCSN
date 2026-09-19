@@ -1,0 +1,32 @@
+const { pool } = require('../config/db');
+
+const ProductModel = {
+  async findAll({ search = '', category = '', brand = '' } = {}) {
+    const conditions = ['p.is_active = 1'];
+    const values = [];
+    if (search) { conditions.push('(p.name LIKE ? OR p.brand LIKE ?)'); values.push(`%${search}%`, `%${search}%`); }
+    if (category) { conditions.push('c.slug = ?'); values.push(category); }
+    if (brand) { conditions.push('p.brand = ?'); values.push(brand); }
+    const [rows] = await pool.query(
+      `SELECT p.*, c.name AS category_name, c.slug AS category_slug
+       FROM products p JOIN categories c ON c.id = p.category_id
+       WHERE ${conditions.join(' AND ')} ORDER BY p.created_at DESC`, values
+    );
+    return rows;
+  },
+  async findById(id) {
+    const [rows] = await pool.query(
+      `SELECT p.*, c.name AS category_name, c.slug AS category_slug
+       FROM products p JOIN categories c ON c.id = p.category_id
+       WHERE p.id = ? AND p.is_active = 1`, [id]
+    );
+    return rows[0] || null;
+  },
+  async getCategories() { const [rows] = await pool.query('SELECT id, name, slug FROM categories ORDER BY name'); return rows; },
+  async getBrands() {
+    const [rows] = await pool.query('SELECT DISTINCT brand FROM products WHERE is_active = 1 AND brand IS NOT NULL ORDER BY brand');
+    return rows.map((row) => row.brand);
+  },
+};
+
+module.exports = ProductModel;
