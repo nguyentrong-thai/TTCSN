@@ -10,6 +10,20 @@ router.get('/', (req, res) => {
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   res.render('cart/index', { title: 'Giỏ hàng - ElectroShop', cart, total });
 });
+router.post('/update/:id', async (req, res, next) => {
+  try {
+    const product = await ProductModel.findById(req.params.id);
+    const item = getCart(req).find((cartItem) => cartItem.id === Number(req.params.id));
+    if (!product || !item) return res.redirect('/cart');
+    const requestedQuantity = Number(req.body.quantity);
+    item.quantity = Math.max(1, Math.min(Number.isFinite(requestedQuantity) ? requestedQuantity : 1, product.stock_qty));
+    item.price = Number(product.price);
+    item.stock_qty = product.stock_qty;
+    if (product.stock_qty < 1) req.session.cart = getCart(req).filter((cartItem) => cartItem.id !== product.id);
+    req.flash('success', 'Đã cập nhật giỏ hàng.');
+    res.redirect('/cart');
+  } catch (err) { next(err); }
+});
 router.post('/add', async (req, res, next) => {
   try {
     const product = await ProductModel.findById(req.body.product_id);

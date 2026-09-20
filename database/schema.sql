@@ -125,9 +125,24 @@ INSERT INTO categories (name, slug, description) VALUES
 ('Đồng hồ thông minh', 'dong-ho-thong-minh', 'Smartwatch các loại');
 
 INSERT INTO products (category_id, name, brand, description, price, stock_qty, image_url) VALUES
-(1, 'iPhone 15', 'Apple', 'iPhone 15 bản tiêu chuẩn, 128GB', 19990000, 20, '/images/products/iphone15.jpg'),
-(1, 'Samsung Galaxy S24', 'Samsung', 'Flagship Android mới nhất', 18990000, 15, '/images/products/s24.jpg'),
-(2, 'MacBook Air M2', 'Apple', 'Laptop mỏng nhẹ, chip M2, 8GB/256GB', 24990000, 10, '/images/products/macbook-air.jpg'),
-(2, 'Asus TUF Gaming A15', 'Asus', 'Laptop gaming tầm trung, RTX 4050', 21990000, 8, '/images/products/tuf-a15.jpg'),
-(3, 'Tai nghe AirPods Pro 2', 'Apple', 'Chống ồn chủ động, sạc không dây', 5490000, 30, '/images/products/airpods-pro2.jpg'),
-(4, 'Apple Watch Series 9', 'Apple', 'Smartwatch cao cấp, theo dõi sức khỏe', 9990000, 12, '/images/products/watch-s9.jpg');
+(1, 'iPhone 18 Pro Max 256GB', 'Apple', 'Super Retina XDR 6.9 inch, chip Apple A20 Pro, camera 48MP.', 41990000, 24, 'https://cdn.tgdd.vn/Products/Images/42/370982/iphone-18-pro-max-den-thumb-600x600.jpg'),
+(1, 'iPhone 18 Pro 256GB', 'Apple', 'Super Retina XDR 6.3 inch, chip Apple A20 Pro, pin 34 giờ.', 38990000, 18, 'https://cdn.tgdd.vn/Products/Images/42/370977/iphone-18-pro-do-thumb-600x600.jpg'),
+(1, 'iPhone Duo 256GB', 'Apple', 'Điện thoại gập hai màn hình, chip Apple A20 Pro.', 64990000, 7, 'https://cdn.tgdd.vn/Products/Images/42/370987/iphone-duo-white-thumb-600x600.jpg'),
+(1, 'iPhone 17 Pro Max 256GB', 'Apple', 'Super Retina XDR 6.9 inch, chip Apple A19 Pro, camera 48MP.', 34590000, 31, 'https://cdn.tgdd.vn/Products/Images/42/342679/iphone-17-pro-max-cam-thumb-600x600.jpg'),
+(1, 'iPhone 17 256GB', 'Apple', 'Super Retina XDR 6.3 inch, chip Apple A19, pin 30 giờ.', 28990000, 42, 'https://cdn.tgdd.vn/Products/Images/42/342667/iphone-17-xanh-thumb-600x600.jpg'),
+(2, 'Acer Predator Helios 18 AI PH18 Ultra 9 275HX', 'Acer', 'Màn hình 18 inch 4K 120Hz, RTX 5090 24GB, RAM 192GB, SSD 6TB.', 149990000, 3, 'https://cdnv2.tgdd.vn/mwg-static/tgdd/Products/Images/44/335963/acer-predator-helios-18-ai-ph18-73-98aq-ultra-9-nhqvwsv001-thumb-638828182518741548-600x600.jpg'),
+(2, 'MSI Gaming Raider 16 MAX HX B2WI', 'MSI', 'Màn hình OLED QHD+ 240Hz, RTX 5080 16GB, RAM 64GB, SSD 2TB.', 129590000, 5, 'https://cdn.tgdd.vn/2026/09/timerseo/367865-600x600-2.png'),
+(2, 'Asus ROG Zephyrus G14 GU405AW', 'Asus', 'Màn hình OLED 14 inch 3K 120Hz, RTX 5080 16GB, RAM 32GB.', 118590000, 9, 'https://cdn.tgdd.vn/2026/09/timerseo/367889-600x600-2.png'),
+(2, 'Asus ROG Flow Z13 GZ302EAC', 'Asus', 'Màn hình WQXGA 13.4 inch 180Hz, AMD Radeon 8060S, RAM 128GB.', 109990000, 4, 'https://cdnv2.tgdd.vn/mwg-static/tgdd/Products/Images/44/364389/asus-gaming-rog-flow-z13-gz302eac-ai-max-395-ru184ws-thumb-639094294582783186-600x600.jpg'),
+(2, 'Acer Predator Helios 18 AI PH18 93P0', 'Acer', 'Màn hình 18 inch 2.5K 250Hz, RTX 5080 16GB, RAM 64GB.', 99990000, 6, 'https://cdnv2.tgdd.vn/mwg-static/tgdd/Products/Images/44/335964/acer-predator-helios-18-ai-ph18-73-93p0-ultra-9-275hx-nhqvysv001-thumb-638828182821796512-600x600.jpg'),
+(3, 'Tai nghe Sennheiser IE900', 'Sennheiser', 'Tai nghe có dây cao cấp, âm thanh chi tiết.', 32000000, 11, 'https://cdnv2.tgdd.vn/mwg-static/tgdd/Products/Images/54/367952/tai-nghe-co-day-ep-sennheiser-ie900-thumb-639164728894103414-600x600.jpg'),
+(3, 'Tai nghe Sennheiser IE600', 'Sennheiser', 'Tai nghe có dây nhỏ gọn, âm thanh cân bằng.', 17000000, 16, 'https://cdnv2.tgdd.vn/mwg-static/tgdd/Products/Images/54/367951/tai-nghe-co-day-ep-sennheiser-ie600-thumb-639164725933282173-600x600.jpg'),
+(3, 'Sony WH-1000XX', 'Sony', 'Tai nghe chụp tai Bluetooth, chống ồn chủ động.', 16990000, 28, 'https://cdn.tgdd.vn/2026/08/timerseo/367818.jpg'),
+(3, 'Bowers & Wilkins Px8', 'Bowers & Wilkins', 'Tai nghe chụp tai Bluetooth cao cấp.', 15695000, 13, 'https://cdnv2.tgdd.vn/mwg-static/tgdd/Products/Images/54/337694/tai-nghe-bluetooth-chup-tai-bowers-wilkins-px8-080525-014027-869-600x600.jpg'),
+(3, 'AirPods Max 2', 'Apple', 'Tai nghe chụp tai cao cấp, âm thanh sống động.', 14490000, 37, 'https://cdn.tgdd.vn/Products/Images/54/364790/airpods-max-2-vang-thumb-600x600.jpg'),
+(4, 'Apple Watch Series 9', 'Apple', 'Đồng hồ thông minh cao cấp, theo dõi sức khỏe.', 9990000, 12, '/images/products/watch-s9.jpg'),
+(4, 'Garmin Forerunner 165 43mm', 'Garmin', 'Đồng hồ chạy bộ GPS, dây silicone, theo dõi sức khỏe.', 3990000, 26, 'https://cdn.tgdd.vn/Products/Images/7077/322848/garmin-forerunner-165-den-tb-600x600.jpg'),
+(4, 'imoo Z1 41mm', 'imoo', 'Đồng hồ định vị trẻ em, dây TPU, hỗ trợ gọi và theo dõi vị trí.', 2490000, 34, 'https://cdn.tgdd.vn/Products/Images/7077/316992/dong-ho-dinh-vi-tre-em-imoo-z1-41-mm-xanh-duong-600x600.jpg'),
+(4, 'Garmin Forerunner 55 42mm', 'Garmin', 'Đồng hồ chạy bộ GPS, dây silicone, thiết kế nhẹ.', 2590000, 41, 'https://cdn.tgdd.vn/Products/Images/7077/244296/garmin-forerunner-55-day-silicone-den-tn-1-2-600x600.jpg'),
+(4, 'Garmin Lily 2 Classic 34mm', 'Garmin', 'Đồng hồ thông minh nhỏ gọn, dây da, theo dõi sức khỏe.', 7840000, 19, 'https://cdn.tgdd.vn/Products/Images/7077/322846/garmin-lily-2-classic-day-da-den-tim-tb-600x600.jpg'),
+(4, 'Garmin Forerunner 265 Music 46.1mm', 'Garmin', 'Đồng hồ thể thao GPS, hỗ trợ nghe nhạc, dây silicone.', 9180000, 8, 'https://cdn.tgdd.vn/Products/Images/7077/305882/garmin-forerunner-265-den-tn-2-600x600.jpg');

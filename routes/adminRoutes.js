@@ -39,6 +39,17 @@ router.get('/', async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
+router.get('/products', async (req, res, next) => {
+  try {
+    const [products] = await pool.query(
+      `SELECT p.*, c.name AS category_name
+       FROM products p JOIN categories c ON c.id = p.category_id
+       ORDER BY p.is_active DESC, p.created_at DESC`
+    );
+    res.render('admin/products', { title: 'Quản lý sản phẩm', products });
+  } catch (err) { next(err); }
+});
+
 router.get('/products/new', async (req, res, next) => {
   try {
     const [categories] = await pool.query('SELECT id, name FROM categories ORDER BY name');

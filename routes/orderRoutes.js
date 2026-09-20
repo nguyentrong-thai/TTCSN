@@ -63,11 +63,28 @@ router.get('/', async (req, res, next) => {
 });
 
 router.post('/:id/cancel', async (req, res, next) => {
+  let connection;
   try {
-    await pool.query("UPDATE orders SET status = 'cancelled' WHERE id = ? AND user_id = ? AND status = 'pending'", [req.params.id, req.session.user.id]);
+    connection = await pool.getConnection();
+    await connection.beginTransaction();
+    const [[order]] = await connection.query(
+      "SELECT id FROM orders WHERE id = ? AND user_id = ? AND status = 'pending' FOR UPDATE",
+      [req.params.id, req.session.user.id]
+    );
+    if (order) {
+      const [items] = await connection.query('SELECT product_id, quantity FROM order_items WHERE order_id = ?', [order.id]);
+      for (const item of items) {
+        await connection.query('UPDATE products SET stock_qty = stock_qty + ? WHERE id = ?', [item.quantity, item.product_id]);
+      }
+      await connection.query("UPDATE orders SET status = 'cancelled' WHERE id = ?", [order.id]);
+    }
+    await connection.commit();
     req.flash('success', 'Đã hủy đơn hàng nếu đơn chưa được xác nhận.');
     res.redirect('/orders');
-  } catch (err) { next(err); }
+  } catch (err) {
+    if (connection) await connection.rollback();
+    next(err);
+  } finally { if (connection) connection.release(); }
 });
 
 module.exports = router;
