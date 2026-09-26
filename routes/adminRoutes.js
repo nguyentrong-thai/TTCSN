@@ -10,6 +10,11 @@ const { requireAdmin } = require('../middlewares/authMiddleware');
 const router = express.Router();
 router.use(requireAdmin);
 
+function getPage(value, limit) {
+  const page = Math.max(1, Number.parseInt(value, 10) || 1);
+  return { page, limit, offset: (page - 1) * limit };
+}
+
 const uploadDirectory = path.join(__dirname, '..', 'public', 'images', 'products');
 fs.mkdirSync(uploadDirectory, { recursive: true });
 const upload = multer({
@@ -98,12 +103,17 @@ router.get('/', async (req, res, next) => {
 
 router.get('/products', async (req, res, next) => {
   try {
+    const { page, limit } = getPage(req.query.page, 12);
+    const [[count]] = await pool.query('SELECT COUNT(*) AS total FROM products');
+    const total = Number(count.total);
+    const totalPages = Math.max(1, Math.ceil(total / limit));
+    const currentPage = Math.min(page, totalPages);
     const [products] = await pool.query(
       `SELECT p.*, c.name AS category_name
        FROM products p JOIN categories c ON c.id = p.category_id
-       ORDER BY p.is_active DESC, p.created_at DESC`
+       ORDER BY p.is_active DESC, p.created_at DESC LIMIT ? OFFSET ?`, [limit, (currentPage - 1) * limit]
     );
-    res.render('admin/products', { title: 'Quản lý sản phẩm', products });
+     res.render('admin/products', { title: 'Quản lý sản phẩm', products, pagination: { currentPage, totalPages, total, path: '/admin/products', query: {} } });
   } catch (err) { next(err); }
 });
 
@@ -313,10 +323,15 @@ router.post('/categories/:id/delete', async (req, res, next) => {
 
 router.get('/orders', async (req, res, next) => {
   try {
+    const { page, limit } = getPage(req.query.page, 10);
+    const [[count]] = await pool.query('SELECT COUNT(*) AS total FROM orders');
+    const total = Number(count.total);
+    const totalPages = Math.max(1, Math.ceil(total / limit));
+    const currentPage = Math.min(page, totalPages);
     const [orders] = await pool.query(
-      `SELECT o.*, u.full_name, u.email FROM orders o JOIN users u ON u.id = o.user_id ORDER BY o.created_at DESC`
+      `SELECT o.*, u.full_name, u.email FROM orders o JOIN users u ON u.id = o.user_id ORDER BY o.created_at DESC LIMIT ? OFFSET ?`, [limit, (currentPage - 1) * limit]
     );
-    res.render('admin/orders', { title: 'Quản lý đơn hàng', orders });
+    res.render('admin/orders', { title: 'Quản lý đơn hàng', orders, pagination: { currentPage, totalPages, total, path: '/admin/orders', query: {} } });
   } catch (err) { next(err); }
 });
 

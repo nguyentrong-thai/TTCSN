@@ -70,8 +70,14 @@ router.post('/', async (req, res, next) => {
 
 router.get('/', async (req, res, next) => {
   try {
-    const [orders] = await pool.query('SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC', [req.session.user.id]);
-    res.render('orders/index', { title: 'Đơn hàng của tôi', orders });
+    const page = Math.max(1, Number.parseInt(req.query.page, 10) || 1);
+    const limit = 10;
+    const [[count]] = await pool.query('SELECT COUNT(*) AS total FROM orders WHERE user_id = ?', [req.session.user.id]);
+    const total = Number(count.total);
+    const totalPages = Math.max(1, Math.ceil(total / limit));
+    const currentPage = Math.min(page, totalPages);
+    const [orders] = await pool.query('SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?', [req.session.user.id, limit, (currentPage - 1) * limit]);
+    res.render('orders/index', { title: 'Đơn hàng của tôi', orders, pagination: { currentPage, totalPages, total, path: '/orders', query: {} } });
   } catch (err) { next(err); }
 });
 

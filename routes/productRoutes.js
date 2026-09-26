@@ -8,8 +8,11 @@ const router = express.Router();
 router.get('/', async (req, res, next) => {
   try {
     const filters = { search: (req.query.search || '').trim(), category: (req.query.category || '').trim(), brand: (req.query.brand || '').trim() };
-    const [products, categories, brands] = await Promise.all([ProductModel.findAll(filters), ProductModel.getCategories(), ProductModel.getBrands()]);
-    res.render('products/index', { title: 'Sản phẩm - ElectroShop', products, categories, brands, filters });
+    const page = Math.max(1, Number.parseInt(req.query.page, 10) || 1);
+    const limit = 12;
+    const [productPage, categories, brands] = await Promise.all([ProductModel.findAll({ ...filters, page, limit }), ProductModel.getCategories(), ProductModel.getBrands()]);
+    const totalPages = Math.max(1, Math.ceil(productPage.total / limit));
+    res.render('products/index', { title: 'Sản phẩm - ElectroShop', products: productPage.rows, categories, brands, filters, pagination: { currentPage: productPage.currentPage, totalPages, total: productPage.total, query: filters, path: '/products' } });
   } catch (err) { next(err); }
 });
 

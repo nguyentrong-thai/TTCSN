@@ -11,6 +11,7 @@ const { rateLimit } = require('express-rate-limit');
 
 const { testConnection } = require('./config/db');
 const indexRoutes = require('./routes/index');
+const profileRoutes = require('./routes/profileRoutes');
 
 const app = express();
 const sessionSecret = process.env.SESSION_SECRET;
@@ -74,6 +75,7 @@ app.use((req, res, next) => {
 // ---------- Routes ----------
 app.use('/', indexRoutes);
 app.use('/auth', authLimiter, require('./routes/authRoutes'));
+app.use('/profile', profileRoutes);
 app.use('/products', require('./routes/productRoutes'));
 app.use('/cart', require('./routes/cartRoutes'));
 app.use('/orders', require('./routes/orderRoutes'));

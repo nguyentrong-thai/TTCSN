@@ -8,10 +8,17 @@ const UserModel = {
 
   async findById(id) {
     const [rows] = await pool.query(
-      'SELECT id, full_name, email, phone, address, role FROM users WHERE id = ?',
+      'SELECT id, full_name, email, phone, address, gender, date_of_birth, role FROM users WHERE id = ?',
       [id]
     );
     return rows[0] || null;
+  },
+
+  async updateProfile(id, { full_name, phone, address, gender, date_of_birth }) {
+    await pool.query(
+      'UPDATE users SET full_name = ?, phone = ?, address = ?, gender = ?, date_of_birth = ? WHERE id = ?',
+      [full_name, phone || null, address || null, gender || null, date_of_birth || null, id]
+    );
   },
 
   async create({ full_name, email, password_hash, phone, address, role = 'user' }) {

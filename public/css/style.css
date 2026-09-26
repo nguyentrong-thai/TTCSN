@@ -43,6 +43,15 @@ body.admin-page .admin-actions { margin-bottom:20px; }
 @media (max-width:700px) { body.admin-page main.container { margin-left:150px; padding:78px 14px 50px; } .admin-side-nav { width:150px; } .admin-side-brand { font-size:11px; padding-left:10px; } .admin-side-nav nav a { font-size:11px; padding:13px 10px; } .admin-topbar { left:150px; } .admin-topbar-user { display:none; } }
 
 body { font-family:'Roboto',sans-serif; }
+.pagination { display:flex; justify-content:center; gap:6px; margin:24px 0 8px; }
+.pagination-link { display:grid; place-items:center; min-width:36px; height:36px; padding:0 8px; border:1px solid var(--line); background:#fff; color:#555; font-size:.82rem; }
+.pagination-link:hover,.pagination-link.is-active { border-color:#b52c24; background:#b52c24; color:#fff; }
+.profile-form { max-width:680px; padding:24px; background:#fff; border:1px solid var(--line); }
+.profile-form label { display:flex; flex-direction:column; gap:7px; margin-bottom:16px; color:var(--muted); font-size:.78rem; font-weight:700; }
+.profile-form input,.profile-form select { width:100%; }
+.profile-form input[readonly] { background:#f3f3f3; color:#777; }
+.profile-form .btn { margin:4px 0 0; }
+.profile-note { display:block; margin:-10px 0 16px; color:var(--muted); font-size:.72rem; }
 .container { max-width:1232px; }
 .site-header { background:#b52c24; color:#fff; }
 .market-topline { background:#98231e; color:#fff; font-size:.75rem; }

@@ -1,18 +1,26 @@
 const { pool } = require('../config/db');
 
 const ProductModel = {
-  async findAll({ search = '', category = '', brand = '' } = {}) {
+  async findAll({ search = '', category = '', brand = '', page = 1, limit = 12 } = {}) {
     const conditions = ['p.is_active = 1'];
     const values = [];
     if (search) { conditions.push('(p.name LIKE ? OR p.brand LIKE ?)'); values.push(`%${search}%`, `%${search}%`); }
     if (category) { conditions.push('c.slug = ?'); values.push(category); }
     if (brand) { conditions.push('p.brand = ?'); values.push(brand); }
+     const [countRows] = await pool.query(
+      `SELECT COUNT(*) AS total
+       FROM products p JOIN categories c ON c.id = p.category_id
+       WHERE ${conditions.join(' AND ')}`, values
+     );
+    const total = Number(countRows[0].total);
+    const totalPages = Math.max(1, Math.ceil(total / limit));
+    const currentPage = Math.min(page, totalPages);
     const [rows] = await pool.query(
       `SELECT p.*, c.name AS category_name, c.slug AS category_slug
        FROM products p JOIN categories c ON c.id = p.category_id
-       WHERE ${conditions.join(' AND ')} ORDER BY p.created_at DESC`, values
+       WHERE ${conditions.join(' AND ')} ORDER BY p.created_at DESC LIMIT ? OFFSET ?`, [...values, limit, (currentPage - 1) * limit]
     );
-    return rows;
+     return { rows, total, currentPage };
   },
   async findById(id) {
     const [rows] = await pool.query(
