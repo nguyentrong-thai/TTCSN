@@ -29,9 +29,12 @@ router.post('/', async (req, res, next) => {
   try {
     const buyNowItem = req.session.buyNow;
     const cart = buyNowItem ? [buyNowItem] : getCart(req);
-    const { shipping_address, shipping_phone, note } = req.body;
-    if (!cart.length || !shipping_address || !shipping_phone) {
-      req.flash('error', 'Vui lòng nhập địa chỉ và số điện thoại giao hàng.');
+    const recipientName = typeof req.body.recipient_name === 'string' ? req.body.recipient_name.trim() : '';
+    const shippingAddress = typeof req.body.shipping_address === 'string' ? req.body.shipping_address.trim() : '';
+    const shippingPhone = typeof req.body.shipping_phone === 'string' ? req.body.shipping_phone.trim() : '';
+    const note = typeof req.body.note === 'string' ? req.body.note.trim() : '';
+    if (!cart.length || cart.some((item) => !Number.isSafeInteger(item.quantity) || item.quantity < 1) || !recipientName || recipientName.length > 100 || !shippingAddress || shippingAddress.length > 255 || !shippingPhone || shippingPhone.length > 20 || note.length > 255) {
+      req.flash('error', 'Vui lòng nhập tên người nhận, địa chỉ và số điện thoại giao hàng hợp lệ.');
       return res.redirect('/orders/checkout');
     }
     connection = await pool.getConnection();
@@ -45,8 +48,8 @@ router.post('/', async (req, res, next) => {
       items.push({ id: product.id, quantity: cartItem.quantity, price: Number(product.price) });
     }
     const [orderResult] = await connection.query(
-      'INSERT INTO orders (user_id, total_amount, shipping_address, shipping_phone, note) VALUES (?, ?, ?, ?, ?)',
-      [req.session.user.id, total, shipping_address.trim(), shipping_phone.trim(), note || null]
+      'INSERT INTO orders (user_id, recipient_name, total_amount, shipping_address, shipping_phone, note) VALUES (?, ?, ?, ?, ?, ?)',
+      [req.session.user.id, recipientName, total, shippingAddress, shippingPhone, note || null]
     );
     for (const item of items) {
       await connection.query('INSERT INTO order_items (order_id, product_id, quantity, unit_price) VALUES (?, ?, ?, ?)', [orderResult.insertId, item.id, item.quantity, item.price]);
@@ -60,7 +63,7 @@ router.post('/', async (req, res, next) => {
     res.redirect('/orders');
   } catch (err) {
     if (connection) await connection.rollback();
-    req.flash('error', err.message || 'Không thể tạo đơn hàng.');
+    req.flash('error', 'Không thể tạo đơn hàng. Vui lòng kiểm tra lại giỏ hàng và thông tin giao hàng.');
     res.redirect('/orders/checkout');
   } finally { if (connection) connection.release(); }
 });

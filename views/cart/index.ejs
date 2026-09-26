@@ -16,11 +16,12 @@
 		<div class="cart-items">
 			<% cart.forEach((item) => { %>
 				<article class="cart-item">
-					<img src="<%= item.image_url || '/images/no-image.svg' %>" onerror="this.onerror=null;this.src='/images/no-image.svg'" alt="<%= item.name %>">
+					<img src="<%= item.image_url || '/images/no-image.svg' %>" alt="<%= item.name %>">
 					<div>
 						<h2><a href="/products/<%= item.id %>"><%= item.name %></a></h2>
 						<p><%= item.price.toLocaleString('vi-VN') %> đ / sản phẩm</p>
 						<form class="quantity-form" method="post" action="/cart/update/<%= item.id %>">
+							<input type="hidden" name="_csrf" value="<%= csrfToken %>">
 								<div class="quantity-field">
 									<label for="cart-quantity-<%= item.id %>">Số lượng</label>
 									<div class="quantity-control" data-quantity-control>
@@ -34,6 +35,7 @@
 					</div>
 					<strong><%= (item.quantity * item.price).toLocaleString('vi-VN') %> đ</strong>
 					<form method="post" action="/cart/remove/<%= item.id %>">
+						<input type="hidden" name="_csrf" value="<%= csrfToken %>">
 						<button class="text-button" type="submit">Xóa</button>
 					</form>
 				</article>

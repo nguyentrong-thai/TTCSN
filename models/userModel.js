@@ -22,6 +22,21 @@ const UserModel = {
     );
     return result.insertId;
   },
+
+  async findEmployees() {
+    const [rows] = await pool.query(
+      "SELECT id, full_name, email, phone, address, role, created_at FROM users WHERE role = 'employee' ORDER BY created_at DESC"
+    );
+    return rows;
+  },
+
+  async findEmployeeById(id) {
+    const [rows] = await pool.query(
+      "SELECT id, full_name, email, phone, address, role FROM users WHERE id = ? AND role = 'employee'",
+      [id]
+    );
+    return rows[0] || null;
+  },
 };
 
 module.exports = UserModel;

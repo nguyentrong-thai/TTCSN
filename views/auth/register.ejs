@@ -3,6 +3,7 @@
 <section class="auth-panel auth-panel--register" aria-labelledby="register-heading">
   <h1 id="register-heading">Đăng ký</h1>
   <form action="/auth/register" method="POST" class="auth-fields">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
     <label class="visually-hidden" for="register-name">Họ và tên</label>
     <input class="auth-control" id="register-name" type="text" name="full_name" placeholder="Họ và tên" autocomplete="name" required>
 

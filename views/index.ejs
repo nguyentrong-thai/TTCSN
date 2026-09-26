@@ -26,7 +26,7 @@
 			<% products.forEach((product) => { %>
 				<article class="market-product-card">
 					<a class="market-product-image" href="/products/<%= product.id %>">
-						<img src="<%= product.image_url || '/images/no-image.svg' %>" onerror="this.onerror=null;this.src='/images/no-image.svg'" alt="<%= product.name %>" loading="lazy">
+						<img src="<%= product.image_url || '/images/no-image.svg' %>" alt="<%= product.name %>" loading="lazy">
 					</a>
 					<div class="market-product-copy">
 						<p class="market-product-brand"><%= product.brand || 'Thiết bị điện tử' %></p>

@@ -1,0 +1,15 @@
+<%- include('../partials/header') %>
+<section class="page-heading"><p class="eyebrow">QUẢN LÝ HÓA ĐƠN</p><h1>Chi tiết đơn hàng #<%= order.id %></h1></section>
+<section class="admin-panel order-detail-panel">
+  <div class="section-row"><h2>Thông tin nhận hàng</h2><span class="order-status status-<%= order.status %>"><%= { pending: 'Chờ xác nhận', confirmed: 'Đã xác nhận', shipping: 'Đang giao', completed: 'Hoàn tất', cancelled: 'Đã hủy' }[order.status] %></span></div>
+  <p><strong>Tên người nhận:</strong> <%= order.recipient_name %></p>
+  <p><strong>Số điện thoại:</strong> <%= order.shipping_phone %></p>
+  <p><strong>Địa chỉ:</strong> <%= order.shipping_address %></p>
+  <p><strong>Email tài khoản:</strong> <%= order.email %></p>
+  <p><strong>Ghi chú:</strong> <%= order.note || 'Không có' %></p>
+  <h2>Sản phẩm</h2>
+  <div class="admin-table"><% items.forEach((item) => { %><div class="table-row"><span><%= item.name %> × <%= item.quantity %></span><strong><%= (Number(item.unit_price) * item.quantity).toLocaleString('vi-VN') %> đ</strong></div><% }) %></div>
+  <div class="summary-total"><span>Tổng tiền</span><strong><%= Number(order.total_amount).toLocaleString('vi-VN') %> đ</strong></div>
+  <a class="cancel-link" href="/admin/orders">Quay lại danh sách</a>
+</section>
+<%- include('../partials/footer') %>

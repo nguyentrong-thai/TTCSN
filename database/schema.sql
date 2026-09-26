@@ -18,7 +18,9 @@ CREATE TABLE users (
   password_hash VARCHAR(255)  NOT NULL,
   phone         VARCHAR(20),
   address       VARCHAR(255),
-  role          ENUM('user', 'admin') NOT NULL DEFAULT 'user',
+  gender        ENUM('male', 'female', 'other') DEFAULT NULL,
+  date_of_birth DATE DEFAULT NULL,
+  role          ENUM('user', 'employee', 'admin') NOT NULL DEFAULT 'user',
   created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
@@ -73,6 +75,7 @@ CREATE TABLE cart_items (
 CREATE TABLE orders (
   id               INT AUTO_INCREMENT PRIMARY KEY,
   user_id          INT NOT NULL,
+  recipient_name   VARCHAR(100) NOT NULL,
   total_amount     DECIMAL(12,2) NOT NULL DEFAULT 0,
   status           ENUM('pending','confirmed','shipping','completed','cancelled')
                      NOT NULL DEFAULT 'pending',
@@ -106,17 +109,31 @@ CREATE TABLE reviews (
   rating      TINYINT NOT NULL CHECK (rating BETWEEN 1 AND 5),
   comment     TEXT,
   created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY uniq_review_user_product (user_id, product_id),
   FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------
+-- Danh sách sản phẩm yêu thích
+-- ---------------------------------------------------------
+CREATE TABLE wishlist_items (
+  id          INT AUTO_INCREMENT PRIMARY KEY,
+  user_id     INT NOT NULL,
+  product_id  INT NOT NULL,
+  created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY uniq_wishlist_user_product (user_id, product_id),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 -- =========================================================
 -- DỮ LIỆU MẪU (seed data)
 -- =========================================================
 
--- Tài khoản admin mặc định (email: admin@electroshop.vn, mật khẩu: admin123)
+-- Tài khoản admin local (email: admin@electroshop.vn, mật khẩu: ElectroShop@2026!)
 INSERT INTO users (full_name, email, password_hash, role) VALUES
-('Quản trị viên', 'admin@electroshop.vn', '$2b$10$Bk3pWmfrglXKJ98n1C4tEOuIe1B1n2P24FEB51wkIWoS0ZUvxqMcm', 'admin');
+('Quản trị viên', 'admin@electroshop.vn', '$2b$12$pAl34yjb0bQBvs98daQhH.z5tB8OhpVdK5AmY45Vs13wYIuqku3LS', 'admin');
 
 INSERT INTO categories (name, slug, description) VALUES
 ('Điện thoại', 'dien-thoai', 'Smartphone các hãng'),
@@ -140,7 +157,7 @@ INSERT INTO products (category_id, name, brand, description, price, stock_qty, i
 (3, 'Sony WH-1000XX', 'Sony', 'Tai nghe chụp tai Bluetooth, chống ồn chủ động.', 16990000, 28, 'https://cdn.tgdd.vn/2026/08/timerseo/367818.jpg'),
 (3, 'Bowers & Wilkins Px8', 'Bowers & Wilkins', 'Tai nghe chụp tai Bluetooth cao cấp.', 15695000, 13, 'https://cdnv2.tgdd.vn/mwg-static/tgdd/Products/Images/54/337694/tai-nghe-bluetooth-chup-tai-bowers-wilkins-px8-080525-014027-869-600x600.jpg'),
 (3, 'AirPods Max 2', 'Apple', 'Tai nghe chụp tai cao cấp, âm thanh sống động.', 14490000, 37, 'https://cdn.tgdd.vn/Products/Images/54/364790/airpods-max-2-vang-thumb-600x600.jpg'),
-(4, 'Apple Watch Series 9', 'Apple', 'Đồng hồ thông minh cao cấp, theo dõi sức khỏe.', 9990000, 12, '/images/products/watch-s9.jpg'),
+(4, 'Apple Watch Series 9', 'Apple', 'Đồng hồ thông minh cao cấp, theo dõi sức khỏe.', 9990000, 12, '/images/no-image.svg'),
 (4, 'Garmin Forerunner 165 43mm', 'Garmin', 'Đồng hồ chạy bộ GPS, dây silicone, theo dõi sức khỏe.', 3990000, 26, 'https://cdn.tgdd.vn/Products/Images/7077/322848/garmin-forerunner-165-den-tb-600x600.jpg'),
 (4, 'imoo Z1 41mm', 'imoo', 'Đồng hồ định vị trẻ em, dây TPU, hỗ trợ gọi và theo dõi vị trí.', 2490000, 34, 'https://cdn.tgdd.vn/Products/Images/7077/316992/dong-ho-dinh-vi-tre-em-imoo-z1-41-mm-xanh-duong-600x600.jpg'),
 (4, 'Garmin Forerunner 55 42mm', 'Garmin', 'Đồng hồ chạy bộ GPS, dây silicone, thiết kế nhẹ.', 2590000, 41, 'https://cdn.tgdd.vn/Products/Images/7077/244296/garmin-forerunner-55-day-silicone-den-tn-1-2-600x600.jpg'),

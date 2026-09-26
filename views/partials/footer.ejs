@@ -10,6 +10,7 @@
         <strong>Mua sắm</strong>
         <a href="/products">Tất cả sản phẩm</a>
         <a href="/cart">Giỏ hàng</a>
+        <% if (currentUser) { %><a href="/wishlist">Sản phẩm yêu thích</a><% } %>
       </div>
       <div class="market-footer-links">
         <strong>Tài khoản</strong>
@@ -20,6 +21,10 @@
       <p class="market-copyright">&copy; <%= new Date().getFullYear() %> Group 12</p>
     </div>
   </footer>
+  <% if (!(typeof authPage !== 'undefined' && authPage)) { %>
+    <%- include('assistant-widget') %>
+    <script src="/js/assistant.js" defer></script>
+  <% } %>
   <script src="/js/site.js" defer></script>
 </body>
 </html>

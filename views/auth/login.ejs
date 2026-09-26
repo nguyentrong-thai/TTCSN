@@ -3,6 +3,7 @@
 <section class="auth-panel auth-panel--login" aria-labelledby="login-heading">
   <h1 id="login-heading">Đăng nhập</h1>
   <form action="/auth/login" method="POST" class="auth-fields">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
     <label class="visually-hidden" for="login-email">Email</label>
     <input class="auth-control" id="login-email" type="email" name="email" placeholder="Email" autocomplete="email" required>
 

@@ -72,7 +72,7 @@ project/
 
 ## 3. Lộ trình theo tuần (đề xuất 8 tuần, điều chỉnh theo deadline thực tế)
 
-> **Trạng thái hiện tại (cập nhật):** Đã hoàn thành Tuần 1 và Tuần 2 (xem chi tiết bên dưới). Đang chuyển sang Tuần 3.
+> **Trạng thái hiện tại (cập nhật):** Các tính năng chính của Tuần 1–6 đã được triển khai. Tuần 7 còn kiểm thử end-to-end và một số hạng mục hoàn thiện; Tuần 8 chưa triển khai.
 
 ### Tuần 1 — Phân tích & thiết kế ✅ Đã xong
 - [x] Xác định phạm vi: website bán đồ điện tử (điện thoại, laptop, phụ kiện, đồng hồ thông minh).
@@ -93,7 +93,7 @@ project/
 - [x] Đặt đúng vị trí `public/css/style.css` (đường dẫn `/css/style.css` mà header đang gọi).
 - [x] Có `.env.example` và `.gitignore` đúng vị trí.
 - [x] Sắp đúng cấu trúc `views/partials/`, `views/auth/` theo các lệnh `include()` đã viết.
-- [x] Có tài khoản admin mẫu trong `schema.sql` với mật khẩu đã hash: `admin@electroshop.vn` / `admin123`.
+- [x] Có tài khoản admin local trong `schema.sql` với mật khẩu đã hash: `admin@electroshop.vn` / `ElectroShop@2026!`.
 
 ### Tuần 3 — Quản lý sản phẩm & danh mục (phía Admin)
 - [x] CRUD danh mục sản phẩm.
@@ -108,7 +108,7 @@ project/
 - [x] Responsive UI bằng CSS responsive.
 
 ### Tuần 5 — Giỏ hàng & đặt hàng
-- [ ] Thêm/xóa/sửa số lượng trong giỏ hàng.
+- [x] Thêm/xóa/sửa số lượng trong giỏ hàng — đã có trong `routes/cartRoutes.js` và `views/cart/index.ejs`.
 - [x] Trang checkout: nhập địa chỉ và số điện thoại giao hàng.
 - [x] Tạo đơn hàng, lưu chi tiết đơn hàng vào DB và trừ tồn kho.
 - [ ] (Phương án B) Tích hợp cổng thanh toán sandbox VNPay/Momo.
@@ -117,19 +117,21 @@ project/
 - [x] Trang "Đơn hàng của tôi" (theo dõi trạng thái, hủy đơn khi chưa xử lý).
 - [x] Admin: xem/xử lý/cập nhật trạng thái đơn hàng (chờ xác nhận → đang giao → hoàn tất/hủy).
 - [ ] Thống kê doanh thu cơ bản (biểu đồ đơn giản — chart.js/recharts).
-- [ ] (Tùy chọn) Đánh giá & bình luận sản phẩm.
+- [x] (Tùy chọn) Đánh giá & bình luận sản phẩm (chỉ tài khoản có đơn hoàn tất).
 
 ### Tuần 7 — Hoàn thiện, kiểm thử, bảo mật
 - [ ] Kiểm thử chức năng (test thủ công theo checklist, hoặc viết test tự động nếu có thời gian).
 - [ ] Xử lý lỗi, validate input (chống SQL injection, XSS).
 - [ ] Tối ưu UI/UX, thêm loading state, thông báo (toast).
-- [ ] Viết README chi tiết (hướng dẫn cài đặt như repo tham khảo).
+- [x] Viết README chi tiết (hướng dẫn cài đặt, cấu hình môi trường, tài khoản admin mẫu, lưu ý khi chạy local).
 
 ### Tuần 8 — Triển khai (deploy) & viết báo cáo
 - [ ] Deploy production (Railway/Render/Vercel), cấu hình biến môi trường (.env).
 - [ ] Kiểm tra lại toàn bộ luồng trên môi trường thật.
 - [ ] Hoàn thiện báo cáo đồ án (mô tả hệ thống, ERD, sơ đồ kiến trúc, ảnh chụp màn hình, hướng dẫn sử dụng).
 - [ ] Chuẩn bị slide + kịch bản demo bảo vệ.
+
+> Cập nhật thực tế (26/09/2026): MySQL local kết nối được; trang chủ, đăng nhập admin, danh sách/chi tiết sản phẩm có ảnh và wishlist đã được smoke-test. Hash admin cũ đã được cập nhật; bảng `wishlist_items` bị thiếu trong database cũ đã được tạo an toàn. CSP đã cho phép hai CDN ảnh được seed sử dụng và ảnh lỗi có fallback không dùng inline handler. Các luồng đăng ký, giỏ hàng, checkout và xử lý đơn chưa được xác minh end-to-end.
 
 ---
 
@@ -179,16 +181,20 @@ project/
 - [x] Giỏ hàng, đặt hàng, hủy đơn
 - [x] Quản lý đơn hàng (Admin)
 - [x] Responsive, giao diện rõ ràng
-- [x] README + báo cáo đầy đủ
+- [ ] README + báo cáo đầy đủ
 - [ ] Video/slide demo
+
+> Cập nhật thực tế: README đã được viết rõ ràng; báo cáo, slide và video demo còn cần hoàn thiện theo đúng deadline.
+
+> Cập nhật thực tế: README đã được viết rõ ràng; báo cáo, slide và video demo còn cần hoàn thiện theo đúng deadline.
 
 **Điểm cộng (nếu còn thời gian):**
 - [ ] Thanh toán online (VNPay/Momo sandbox)
-- [ ] Đánh giá/bình luận sản phẩm
-- [ ] Chatbot tư vấn/gợi ý sản phẩm đơn giản
+- [x] Đánh giá/bình luận sản phẩm
+- [x] Chatbot tư vấn/gợi ý sản phẩm đơn giản (theo catalog, từ khóa và ngân sách)
 - [ ] Thống kê doanh thu dạng biểu đồ
 - [ ] Gửi email xác nhận đơn hàng (Nodemailer)
-- [ ] Wishlist (sản phẩm yêu thích)
+- [x] Wishlist (sản phẩm yêu thích, lưu theo tài khoản)
 
 ---
 

@@ -2,6 +2,8 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const multer = require('multer');
+const sharp = require('sharp');
+const bcrypt = require('bcrypt');
 const { pool } = require('../config/db');
 const { requireAdmin } = require('../middlewares/authMiddleware');
 
@@ -11,23 +13,78 @@ router.use(requireAdmin);
 const uploadDirectory = path.join(__dirname, '..', 'public', 'images', 'products');
 fs.mkdirSync(uploadDirectory, { recursive: true });
 const upload = multer({
-  storage: multer.diskStorage({
-    destination: uploadDirectory,
-    filename: (req, file, callback) => {
-      const extension = path.extname(file.originalname).toLowerCase();
-      const safeName = path.basename(file.originalname, extension).replace(/[^a-z0-9]+/gi, '-').toLowerCase().replace(/^-|-$/g, '') || 'product';
-      callback(null, `${Date.now()}-${safeName}${extension}`);
-    },
-  }),
+  storage: multer.memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (req, file, callback) => {
-    if (file.mimetype.startsWith('image/')) return callback(null, true);
+    const extension = path.extname(file.originalname).toLowerCase();
+    if (['.jpg', '.jpeg', '.png', '.webp'].includes(extension) && ['image/jpeg', 'image/png', 'image/webp'].includes(file.mimetype)) return callback(null, true);
     callback(new Error('Chỉ được upload file hình ảnh.'));
   },
 });
 
-function getUploadedImageUrl(file) {
-  return file ? `/images/products/${file.filename}` : null;
+async function saveUploadedImage(file) {
+  if (!file) return null;
+  const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.webp`;
+  await sharp(file.buffer).rotate().resize({ width: 1600, height: 1600, fit: 'inside', withoutEnlargement: true }).webp({ quality: 82 }).toFile(path.join(uploadDirectory, filename));
+  return `/images/products/${filename}`;
+}
+
+function getImageUrl(value) {
+  if (typeof value !== 'string' || !value.trim()) return null;
+  try {
+    const url = new URL(value.trim(), 'http://localhost');
+    if (url.origin === 'http://localhost' && value.trim().startsWith('/images/')) return value.trim();
+    if (['http:', 'https:'].includes(url.protocol)) return url.href;
+  } catch (err) {
+    return null;
+  }
+  return null;
+}
+
+function validateProductInput({ name, category_id, price, stock_qty } = {}) {
+  if (typeof name !== 'string' || !name.trim() || name.trim().length > 200) return null;
+  if (typeof category_id !== 'string' || !category_id.trim()) return null;
+  if (typeof price !== 'string' || !price.trim()) return null;
+  if (typeof stock_qty !== 'string' || !stock_qty.trim()) return null;
+
+  const categoryId = Number(category_id);
+  const productPrice = Number(price);
+  const stockQuantity = Number(stock_qty);
+  if (!Number.isSafeInteger(categoryId) || categoryId < 1) return null;
+  if (!Number.isFinite(productPrice) || productPrice < 0 || productPrice > 9999999999.99) return null;
+  if (!Number.isSafeInteger(stockQuantity) || stockQuantity < 0 || stockQuantity > 2147483647) return null;
+
+  return { name: name.trim(), categoryId, price: productPrice, stockQuantity };
+}
+
+function getCategoryInput({ name, slug, description } = {}) {
+  if (typeof name !== 'string' || !name.trim() || name.trim().length > 100) return null;
+  if (typeof slug !== 'string' || !slug.trim() || slug.trim().length > 120) return null;
+  return {
+    name: name.trim(),
+    slug: slug.trim(),
+    description: typeof description === 'string' && description.trim() ? description.trim() : null,
+  };
+}
+
+function getEmployeeInput({ full_name, email, phone, address, gender, date_of_birth, password } = {}, { requirePassword = true } = {}) {
+  if (typeof full_name !== 'string' || !full_name.trim() || full_name.trim().length > 100) return null;
+  if (typeof email !== 'string' || !/^\S+@\S+\.\S+$/.test(email.trim()) || email.trim().length > 150) return null;
+  if (typeof phone !== 'string' || phone.trim().length > 20) return null;
+  if (typeof address !== 'string' || address.trim().length > 255) return null;
+  if (gender && !['male', 'female', 'other'].includes(gender)) return null;
+  if (date_of_birth && !/^\d{4}-\d{2}-\d{2}$/.test(date_of_birth)) return null;
+  if (requirePassword && (typeof password !== 'string' || password.length < 6)) return null;
+  if (!requirePassword && password && password.length < 6) return null;
+  return {
+    fullName: full_name.trim(),
+    email: email.trim().toLowerCase(),
+    phone: phone.trim() || null,
+    address: address.trim() || null,
+    gender: gender || null,
+    dateOfBirth: date_of_birth || null,
+    password: password || null,
+  };
 }
 
 router.get('/', async (req, res, next) => {
@@ -50,6 +107,95 @@ router.get('/products', async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
+router.get('/users', async (req, res, next) => {
+  try {
+    const [employees] = await pool.query(
+      "SELECT id, full_name, email, phone, address, gender, date_of_birth, role, created_at FROM users WHERE role = 'employee' ORDER BY created_at DESC"
+    );
+    res.render('admin/users', { title: 'Quản lý nhân viên', employees });
+  } catch (err) { next(err); }
+});
+
+router.get('/staff', (req, res) => res.redirect('/admin/users'));
+
+router.get('/users/new', (req, res) => {
+  res.render('admin/employee-form', { title: 'Thêm nhân viên', employee: {}, formAction: '/admin/users' });
+});
+
+router.post('/users', async (req, res, next) => {
+  try {
+    const employee = getEmployeeInput(req.body);
+    if (!employee) {
+      req.flash('error', 'Vui lòng nhập họ tên, email và mật khẩu hợp lệ.');
+      return res.redirect('/admin/users/new');
+    }
+    const passwordHash = await bcrypt.hash(employee.password, 12);
+    await pool.query(
+      'INSERT INTO users (full_name, email, password_hash, phone, address, gender, date_of_birth, role) VALUES (?, ?, ?, ?, ?, ?, ?, \'employee\')',
+      [employee.fullName, employee.email, passwordHash, employee.phone, employee.address, employee.gender, employee.dateOfBirth]
+    );
+    req.flash('success', 'Đã thêm tài khoản nhân viên.');
+    res.redirect('/admin/users');
+  } catch (err) {
+    if (err.code === 'ER_DUP_ENTRY') {
+      req.flash('error', 'Email nhân viên đã tồn tại.');
+      return res.redirect('/admin/users/new');
+    }
+    next(err);
+  }
+});
+
+router.get('/users/:id/edit', async (req, res, next) => {
+  try {
+    const [[employee]] = await pool.query(
+      "SELECT id, full_name, email, phone, address, gender, date_of_birth, role FROM users WHERE id = ? AND role = 'employee'",
+      [req.params.id]
+    );
+    if (!employee) return res.status(404).render('404', { title: 'Không tìm thấy nhân viên' });
+    res.render('admin/employee-form', { title: 'Sửa nhân viên', employee, formAction: `/admin/users/${employee.id}/update` });
+  } catch (err) { next(err); }
+});
+
+router.post('/users/:id/update', async (req, res, next) => {
+  try {
+    const employee = getEmployeeInput(req.body, { requirePassword: false });
+    if (!employee) {
+      req.flash('error', 'Vui lòng nhập thông tin nhân viên hợp lệ.');
+      return res.redirect(`/admin/users/${req.params.id}/edit`);
+    }
+    const [[existing]] = await pool.query("SELECT id FROM users WHERE id = ? AND role = 'employee'", [req.params.id]);
+    if (!existing) return res.status(404).render('404', { title: 'Không tìm thấy nhân viên' });
+    if (employee.password) {
+      const passwordHash = await bcrypt.hash(employee.password, 12);
+      await pool.query(
+        'UPDATE users SET full_name = ?, email = ?, password_hash = ?, phone = ?, address = ?, gender = ?, date_of_birth = ? WHERE id = ? AND role = \'employee\'',
+        [employee.fullName, employee.email, passwordHash, employee.phone, employee.address, employee.gender, employee.dateOfBirth, req.params.id]
+      );
+    } else {
+      await pool.query(
+        'UPDATE users SET full_name = ?, email = ?, phone = ?, address = ?, gender = ?, date_of_birth = ? WHERE id = ? AND role = \'employee\'',
+        [employee.fullName, employee.email, employee.phone, employee.address, employee.gender, employee.dateOfBirth, req.params.id]
+      );
+    }
+    req.flash('success', 'Đã cập nhật tài khoản nhân viên.');
+    res.redirect('/admin/users');
+  } catch (err) {
+    if (err.code === 'ER_DUP_ENTRY') {
+      req.flash('error', 'Email nhân viên đã tồn tại.');
+      return res.redirect(`/admin/users/${req.params.id}/edit`);
+    }
+    next(err);
+  }
+});
+
+router.post('/users/:id/delete', async (req, res, next) => {
+  try {
+    await pool.query("DELETE FROM users WHERE id = ? AND role = 'employee'", [req.params.id]);
+    req.flash('success', 'Đã xóa tài khoản nhân viên.');
+    res.redirect('/admin/users');
+  } catch (err) { next(err); }
+});
+
 router.get('/products/new', async (req, res, next) => {
   try {
     const [categories] = await pool.query('SELECT id, name FROM categories ORDER BY name');
@@ -60,14 +206,16 @@ router.get('/products/new', async (req, res, next) => {
 router.post('/products', upload.single('image'), async (req, res, next) => {
   try {
     const { name, category_id, brand, description, price, stock_qty, image_url } = req.body;
-    if (!name || !category_id || Number(price) < 0 || Number(stock_qty) < 0) {
+    const product = validateProductInput({ name, category_id, price, stock_qty });
+    if (!product) {
       req.flash('error', 'Vui lòng nhập tên, danh mục, giá và tồn kho hợp lệ.');
       return res.redirect('/admin/products/new');
     }
+    const imageUrl = await saveUploadedImage(req.file);
     await pool.query(
       `INSERT INTO products (category_id, name, brand, description, price, stock_qty, image_url)
        VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [category_id, name.trim(), brand || null, description || null, Number(price), Number(stock_qty), getUploadedImageUrl(req.file) || image_url || null]
+      [product.categoryId, product.name, brand || null, description || null, product.price, product.stockQuantity, imageUrl || getImageUrl(image_url)]
     );
     req.flash('success', 'Đã thêm sản phẩm.');
     res.redirect('/admin');
@@ -86,12 +234,17 @@ router.get('/products/:id/edit', async (req, res, next) => {
 router.post('/products/:id/update', upload.single('image'), async (req, res, next) => {
   try {
     const { name, category_id, brand, description, price, stock_qty, image_url } = req.body;
+    const product = validateProductInput({ name, category_id, price, stock_qty });
+    if (!product) {
+      req.flash('error', 'Vui lòng nhập tên, danh mục, giá và tồn kho hợp lệ.');
+      return res.redirect(`/admin/products/${req.params.id}/edit`);
+    }
     const [[currentProduct]] = await pool.query('SELECT image_url FROM products WHERE id = ?', [req.params.id]);
     if (!currentProduct) return res.status(404).render('404', { title: 'Không tìm thấy sản phẩm' });
-    const finalImageUrl = getUploadedImageUrl(req.file) || image_url || currentProduct.image_url || null;
+    const finalImageUrl = await saveUploadedImage(req.file) || getImageUrl(image_url) || currentProduct.image_url || null;
     await pool.query(
       `UPDATE products SET category_id = ?, name = ?, brand = ?, description = ?, price = ?, stock_qty = ?, image_url = ? WHERE id = ?`,
-      [category_id, name.trim(), brand || null, description || null, Number(price), Number(stock_qty), finalImageUrl, req.params.id]
+      [product.categoryId, product.name, brand || null, description || null, product.price, product.stockQuantity, finalImageUrl, req.params.id]
     );
     req.flash('success', 'Đã cập nhật sản phẩm.');
     res.redirect('/admin');
@@ -123,8 +276,12 @@ router.get('/categories/:id/edit', async (req, res, next) => {
 
 router.post('/categories', async (req, res, next) => {
   try {
-    const { name, slug, description } = req.body;
-    await pool.query('INSERT INTO categories (name, slug, description) VALUES (?, ?, ?)', [name.trim(), slug.trim(), description || null]);
+    const category = getCategoryInput(req.body);
+    if (!category) {
+      req.flash('error', 'Vui lòng nhập tên danh mục và slug hợp lệ.');
+      return res.redirect('/admin/categories');
+    }
+    await pool.query('INSERT INTO categories (name, slug, description) VALUES (?, ?, ?)', [category.name, category.slug, category.description]);
     req.flash('success', 'Đã thêm danh mục.');
     res.redirect('/admin/categories');
   } catch (err) { next(err); }
@@ -132,8 +289,12 @@ router.post('/categories', async (req, res, next) => {
 
 router.post('/categories/:id/update', async (req, res, next) => {
   try {
-    const { name, slug, description } = req.body;
-    await pool.query('UPDATE categories SET name = ?, slug = ?, description = ? WHERE id = ?', [name.trim(), slug.trim(), description || null, req.params.id]);
+    const category = getCategoryInput(req.body);
+    if (!category) {
+      req.flash('error', 'Vui lòng nhập tên danh mục và slug hợp lệ.');
+      return res.redirect(`/admin/categories/${req.params.id}/edit`);
+    }
+    await pool.query('UPDATE categories SET name = ?, slug = ?, description = ? WHERE id = ?', [category.name, category.slug, category.description, req.params.id]);
     req.flash('success', 'Đã cập nhật danh mục.');
     res.redirect('/admin/categories');
   } catch (err) { next(err); }
@@ -160,11 +321,105 @@ router.get('/orders', async (req, res, next) => {
 });
 
 router.post('/orders/:id/status', async (req, res, next) => {
+  let connection;
+  let transactionStarted = false;
   try {
-    const statuses = ['pending', 'confirmed', 'shipping', 'completed', 'cancelled'];
-    if (!statuses.includes(req.body.status)) return res.redirect('/admin/orders');
-    await pool.query('UPDATE orders SET status = ? WHERE id = ?', [req.body.status, req.params.id]);
+    const allowedTransitions = {
+      pending: ['confirmed', 'cancelled'],
+      confirmed: ['shipping', 'cancelled'],
+      shipping: ['completed'],
+      completed: [],
+      cancelled: [],
+    };
+    const validStatuses = ['pending', 'confirmed', 'shipping', 'completed', 'cancelled'];
+    if (!validStatuses.includes(req.body.status)) {
+      req.flash('error', 'Trạng thái đơn hàng không hợp lệ.');
+      return res.redirect('/admin/orders');
+    }
+
+    connection = await pool.getConnection();
+    await connection.beginTransaction();
+    transactionStarted = true;
+    const [[order]] = await connection.query('SELECT id, status FROM orders WHERE id = ? FOR UPDATE', [req.params.id]);
+    if (!order) {
+      await connection.rollback();
+      transactionStarted = false;
+      req.flash('error', 'Không tìm thấy đơn hàng.');
+      return res.redirect('/admin/orders');
+    }
+    if (order.status !== req.body.status && !allowedTransitions[order.status].includes(req.body.status)) {
+      await connection.rollback();
+      transactionStarted = false;
+      req.flash('error', 'Không thể chuyển đơn hàng sang trạng thái đã chọn.');
+      return res.redirect('/admin/orders');
+    }
+
+    if (order.status !== req.body.status && req.body.status === 'cancelled') {
+      const [items] = await connection.query('SELECT product_id, quantity FROM order_items WHERE order_id = ?', [order.id]);
+      for (const item of items) {
+        await connection.query('UPDATE products SET stock_qty = stock_qty + ? WHERE id = ?', [item.quantity, item.product_id]);
+      }
+    }
+    await connection.query('UPDATE orders SET status = ? WHERE id = ?', [req.body.status, order.id]);
+    await connection.commit();
+    transactionStarted = false;
     req.flash('success', 'Đã cập nhật trạng thái đơn hàng.');
+    res.redirect('/admin/orders');
+  } catch (err) {
+    if (connection && transactionStarted) await connection.rollback();
+    next(err);
+  } finally {
+    if (connection) connection.release();
+  }
+});
+
+// Compatibility routes matching the reference project's admin URLs.
+router.get('/dashboard', (req, res) => res.redirect('/admin'));
+router.get('/staffs', (req, res) => res.redirect('/admin/users'));
+router.get('/staffs/add', (req, res) => res.redirect('/admin/users/new'));
+router.get('/staffs/edit/:id', (req, res) => res.redirect(`/admin/users/${req.params.id}/edit`));
+router.post('/staffs/delete/:id', async (req, res, next) => {
+  try {
+    await pool.query("DELETE FROM users WHERE id = ? AND role = 'employee'", [req.params.id]);
+    req.flash('success', 'Đã xóa tài khoản nhân viên.');
+    res.redirect('/admin/users');
+  } catch (err) { next(err); }
+});
+router.get('/products/add', (req, res) => res.redirect('/admin/products/new'));
+router.get('/products/edit/:id', (req, res) => res.redirect(`/admin/products/${req.params.id}/edit`));
+router.get('/categories/add', (req, res) => res.redirect('/admin/categories'));
+router.get('/categories/edit/:id', (req, res) => res.redirect(`/admin/categories/${req.params.id}/edit`));
+router.get('/bills', (req, res) => res.redirect('/admin/orders'));
+router.get('/bills/:id', (req, res) => res.redirect(`/admin/orders/${req.params.id}`));
+router.get('/bills/details/:id', (req, res) => res.redirect(`/admin/orders/${req.params.id}`));
+
+router.get('/orders/:id', async (req, res, next) => {
+  try {
+    const [[order]] = await pool.query(
+      `SELECT o.*, u.email FROM orders o JOIN users u ON u.id = o.user_id WHERE o.id = ?`,
+      [req.params.id]
+    );
+    if (!order) return res.status(404).render('404', { title: 'Không tìm thấy đơn hàng' });
+    const [items] = await pool.query(
+      `SELECT oi.quantity, oi.unit_price, p.name FROM order_items oi JOIN products p ON p.id = oi.product_id WHERE oi.order_id = ?`,
+      [req.params.id]
+    );
+    res.render('admin/order-detail', { title: `Chi tiết đơn hàng #${order.id}`, order, items });
+  } catch (err) { next(err); }
+});
+
+router.post('/bills/approve/:id', async (req, res, next) => {
+  try {
+    await pool.query("UPDATE orders SET status = 'confirmed' WHERE id = ? AND status = 'pending'", [req.params.id]);
+    req.flash('success', 'Đã duyệt đơn hàng.');
+    res.redirect('/admin/orders');
+  } catch (err) { next(err); }
+});
+
+router.post('/bills/cancel/:id', async (req, res, next) => {
+  try {
+    await pool.query("UPDATE orders SET status = 'cancelled' WHERE id = ? AND status IN ('pending', 'confirmed')", [req.params.id]);
+    req.flash('success', 'Đã hủy đơn hàng.');
     res.redirect('/admin/orders');
   } catch (err) { next(err); }
 });

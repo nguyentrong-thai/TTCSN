@@ -3,11 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="csrf-token" content="<%= csrfToken %>">
   <title><%= title %></title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" crossorigin="anonymous" referrerpolicy="no-referrer">
   <link rel="stylesheet" href="/css/style.css">
 </head>
-<body class="<%= typeof authPage !== 'undefined' && authPage ? 'auth-page' : '' %>">
+<body class="<%= typeof authPage !== 'undefined' && authPage ? 'auth-page' : '' %> <%= typeof isAdminPage !== 'undefined' && isAdminPage ? 'admin-page' : '' %>">
+  <% if (typeof isAdminPage !== 'undefined' && isAdminPage) { %>
+    <aside class="admin-side-nav">
+      <a class="admin-side-brand" href="/admin">TRANG CHỦ</a>
+      <nav>
+        <a class="<%= currentPath.startsWith('/admin/users') ? 'is-active' : '' %>" href="/admin/users">Quản lý tài khoản</a>
+        <a class="<%= currentPath.startsWith('/admin/products') ? 'is-active' : '' %>" href="/admin/products">Quản lý sản phẩm</a>
+        <a class="<%= currentPath.startsWith('/admin/categories') ? 'is-active' : '' %>" href="/admin/categories">Quản lý thể loại</a>
+        <a class="<%= currentPath.startsWith('/admin/orders') || currentPath.startsWith('/admin/bills') ? 'is-active' : '' %>" href="/admin/orders">Quản lý hóa đơn</a>
+      </nav>
+    </aside>
+    <div class="admin-topbar">
+      <div class="admin-topbar-search"><span aria-hidden="true">⌕</span><input type="search" placeholder="Tìm kiếm"></div>
+      <span class="admin-topbar-user"><%= currentUser.full_name %></span>
+    </div>
+  <% } %>
   <header class="site-header">
     <div class="market-topline">
       <div class="container market-topline-inner">
@@ -22,7 +38,7 @@
           <% if (currentUser) { %>
             <% if (currentUser.role === 'admin') { %><a href="/admin">Quản trị</a><% } %>
             <span>Xin chào, <%= currentUser.full_name %></span>
-            <a href="/auth/logout" data-confirm-logout>Đăng xuất</a>
+            <form class="inline-form" method="post" action="/auth/logout"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button class="text-button" type="submit" data-confirm-logout>Đăng xuất</button></form>
           <% } else { %>
             <a href="/auth/login">Đăng nhập</a>
             <a href="/auth/register">Đăng ký</a>
@@ -48,6 +64,7 @@
         <a href="/">Trang chủ</a>
         <a href="/products">Tất cả sản phẩm</a>
         <% if (currentUser) { %><a href="/orders">Đơn mua</a><% } %>
+        <% if (currentUser) { %><a href="/wishlist">Yêu thích</a><% } %>
       </div>
     </nav>
   </header>

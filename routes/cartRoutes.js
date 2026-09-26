@@ -18,7 +18,7 @@ router.post('/update/:id', async (req, res, next) => {
     const item = getCart(req).find((cartItem) => cartItem.id === Number(req.params.id));
     if (!product || !item) return res.redirect('/cart');
     const requestedQuantity = Number(req.body.quantity);
-    item.quantity = Math.max(1, Math.min(Number.isFinite(requestedQuantity) ? requestedQuantity : 1, product.stock_qty));
+    item.quantity = Math.max(1, Math.min(Number.isSafeInteger(requestedQuantity) ? requestedQuantity : 1, product.stock_qty));
     item.price = Number(product.price);
     item.stock_qty = product.stock_qty;
     if (product.stock_qty < 1) req.session.cart = getCart(req).filter((cartItem) => cartItem.id !== product.id);
@@ -30,7 +30,8 @@ router.post('/add', async (req, res, next) => {
   try {
     const product = await ProductModel.findById(req.body.product_id);
     if (!product || product.stock_qty < 1) { req.flash('error', 'Sản phẩm hiện đã hết hàng.'); return res.redirect('/products'); }
-    const quantity = Math.max(1, Math.min(Number(req.body.quantity) || 1, product.stock_qty));
+    const requestedQuantity = Number(req.body.quantity);
+    const quantity = Math.max(1, Math.min(Number.isSafeInteger(requestedQuantity) ? requestedQuantity : 1, product.stock_qty));
     const cartItem = { id: product.id, name: product.name, price: Number(product.price), image_url: product.image_url, quantity, stock_qty: product.stock_qty };
     if (req.body.intent === 'buy_now') {
       req.session.buyNow = cartItem;
