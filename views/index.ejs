@@ -1,7 +1,51 @@
 <%- include('partials/header') %>
 
-<section class="hero"><div class="hero-copy"><p class="eyebrow">ELECTROSHOP · CÔNG NGHỆ CHO ĐỜI SỐNG</p><h1>Món đồ bạn cần.<br><em>Trải nghiệm bạn muốn.</em></h1><p>Khám phá thiết bị chính hãng, giá rõ ràng và được chọn lọc cho từng khoảnh khắc của bạn.</p><a href="/products" class="btn btn-primary">Khám phá sản phẩm <span>↗</span></a><div class="hero-meta"><span><strong>ĐỦ</strong> lựa chọn</span><span><strong>100%</strong> tuyển chọn</span></div></div><div class="hero-orbit"><div class="orbit-ring"></div><div class="hero-device">⌁</div><p>NEW<br><strong>NOW</strong></p></div></section>
-<section class="category-strip"><div class="section-row"><div><p class="eyebrow">KHÁM PHÁ THEO NHU CẦU</p><h2>Danh mục nổi bật</h2></div><a href="/products">Xem tất cả ↗</a></div><div class="category-list"><% categories.forEach((cat, index) => { %><a class="category-item category-<%= index %>" href="/products?category=<%= cat.slug %>"><span class="category-icon"><%= ['⌁', '▱', '◉', '◌'][index % 4] %></span><strong><%= cat.name %></strong><small><%= cat.description || 'Khám phá ngay' %></small></a><% }); %></div></section>
-<section class="products"><div class="section-row"><div><p class="eyebrow">ĐƯỢC YÊU THÍCH TUẦN NÀY</p><h2>Sản phẩm nổi bật</h2></div><a href="/products">Xem tất cả ↗</a></div><div class="product-grid"><% products.forEach(function(p) { %><article class="product-card"><a class="product-image" href="/products/<%= p.id %>"><img src="<%= p.image_url || '/images/no-image.svg' %>" onerror="this.src='/images/no-image.svg'" alt="<%= p.name %>"></a><div class="product-copy"><p class="product-category"><%= p.brand %></p><h3><a href="/products/<%= p.id %>"><%= p.name %></a></h3><div class="product-bottom"><strong class="price"><%= Number(p.price).toLocaleString('vi-VN') %> đ</strong><span class="stock"><%= p.stock_qty > 0 ? 'Còn hàng' : 'Hết hàng' %></span></div></div></article><% }); %></div></section>
+<section class="market-categories" aria-labelledby="category-heading">
+	<div class="market-section-heading">
+		<h1 id="category-heading">Danh mục</h1>
+		<a href="/products">Xem tất cả <span aria-hidden="true">›</span></a>
+	</div>
+	<div class="market-category-grid">
+		<% categories.forEach((cat, index) => { %>
+			<a class="market-category-card" href="/products?category=<%= encodeURIComponent(cat.slug) %>">
+				<span class="market-category-number"><%= String(index + 1).padStart(2, '0') %></span>
+				<strong><%= cat.name %></strong>
+				<span class="market-category-description"><%= cat.description || 'Khám phá sản phẩm' %></span>
+			</a>
+		<% }); %>
+	</div>
+</section>
+
+<section class="market-featured" aria-labelledby="featured-heading">
+	<div class="market-section-heading market-featured-heading">
+		<h2 id="featured-heading">Gợi ý của hôm nay</h2>
+		<a href="/products">Xem tất cả <span aria-hidden="true">›</span></a>
+	</div>
+	<% if (products.length) { %>
+		<div class="market-product-grid">
+			<% products.forEach((product) => { %>
+				<article class="market-product-card">
+					<a class="market-product-image" href="/products/<%= product.id %>">
+						<img src="<%= product.image_url || '/images/no-image.svg' %>" onerror="this.onerror=null;this.src='/images/no-image.svg'" alt="<%= product.name %>" loading="lazy">
+					</a>
+					<div class="market-product-copy">
+						<p class="market-product-brand"><%= product.brand || 'Thiết bị điện tử' %></p>
+						<h3><a href="/products/<%= product.id %>"><%= product.name %></a></h3>
+						<div class="market-product-bottom">
+							<strong><%= Number(product.price).toLocaleString('vi-VN') %><small>đ</small></strong>
+							<span class="market-product-stock <%= product.stock_qty > 0 ? '' : 'is-out' %>"><%= product.stock_qty > 0 ? 'Còn hàng' : 'Hết hàng' %></span>
+						</div>
+					</div>
+				</article>
+			<% }); %>
+		</div>
+	<% } else { %>
+		<div class="market-empty-state">
+			<h3>Chưa có sản phẩm để gợi ý</h3>
+			<p>Sản phẩm sẽ xuất hiện tại đây khi cửa hàng cập nhật kho hàng.</p>
+			<a href="/products">Khám phá cửa hàng</a>
+		</div>
+	<% } %>
+</section>
 
 <%- include('partials/footer') %>

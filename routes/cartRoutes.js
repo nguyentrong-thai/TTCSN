@@ -6,6 +6,8 @@ function getCart(req) { if (!req.session.cart) req.session.cart = []; return req
 
 router.use((req, res, next) => { res.locals.cartCount = getCart(req).reduce((sum, item) => sum + item.quantity, 0); next(); });
 router.get('/', (req, res) => {
+  delete req.session.buyNow;
+  delete req.session.returnTo;
   const cart = getCart(req);
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   res.render('cart/index', { title: 'Giỏ hàng - ElectroShop', cart, total });
@@ -29,10 +31,23 @@ router.post('/add', async (req, res, next) => {
     const product = await ProductModel.findById(req.body.product_id);
     if (!product || product.stock_qty < 1) { req.flash('error', 'Sản phẩm hiện đã hết hàng.'); return res.redirect('/products'); }
     const quantity = Math.max(1, Math.min(Number(req.body.quantity) || 1, product.stock_qty));
+    const cartItem = { id: product.id, name: product.name, price: Number(product.price), image_url: product.image_url, quantity, stock_qty: product.stock_qty };
+    if (req.body.intent === 'buy_now') {
+      req.session.buyNow = cartItem;
+      if (!req.session.user) {
+        req.session.returnTo = '/orders/checkout';
+        req.flash('success', 'Đăng nhập để tiếp tục thanh toán sản phẩm.');
+        return res.redirect('/auth/login');
+      }
+      return res.redirect('/orders/checkout');
+    }
+
+    delete req.session.buyNow;
+    delete req.session.returnTo;
     const cart = getCart(req);
     const existing = cart.find((item) => item.id === product.id);
     if (existing) existing.quantity = Math.min(existing.quantity + quantity, product.stock_qty);
-    else cart.push({ id: product.id, name: product.name, price: Number(product.price), image_url: product.image_url, quantity, stock_qty: product.stock_qty });
+    else cart.push(cartItem);
     req.flash('success', 'Đã thêm sản phẩm vào giỏ hàng.');
     res.redirect('/cart');
   } catch (err) { next(err); }

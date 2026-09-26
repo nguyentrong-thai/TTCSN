@@ -18,6 +18,7 @@ router.get('/', async (req, res, next) => {
 
     res.render('index', {
       title: 'Trang chủ - ElectroShop',
+      marketHome: true,
       categories,
       products,
     });

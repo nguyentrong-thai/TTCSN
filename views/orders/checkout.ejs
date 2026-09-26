@@ -1,4 +1,23 @@
 <%- include('../partials/header') %>
 <section class="page-heading"><p class="eyebrow">HOÀN TẤT ĐƠN HÀNG</p><h1>Thông tin giao hàng</h1></section>
-<div class="checkout-layout"><form class="admin-form" method="post" action="/orders"><label>Địa chỉ giao hàng<input name="shipping_address" value="<%= user.address || '' %>" required></label><label>Số điện thoại<input name="shipping_phone" value="<%= user.phone || '' %>" required></label><label>Ghi chú<textarea name="note" rows="3"></textarea></label><button class="btn btn-primary" type="submit">Xác nhận đặt hàng</button></form><aside class="cart-summary"><p class="eyebrow">TỔNG ĐƠN</p><% cart.forEach((item) => { %><p class="summary-line"><span><%= item.name %> x <%= item.quantity %></span><strong><%= (item.price * item.quantity).toLocaleString('vi-VN') %> đ</strong></p><% }) %><div class="summary-total"><span>Tổng cộng</span><strong><%= total.toLocaleString('vi-VN') %> đ</strong></div></aside></div>
+<div class="checkout-layout">
+	<form class="admin-form" method="post" action="/orders">
+		<label>Địa chỉ giao hàng<input name="shipping_address" value="<%= user.address || '' %>" required></label>
+		<label>Số điện thoại<input name="shipping_phone" value="<%= user.phone || '' %>" required></label>
+		<label>Ghi chú<textarea name="note" rows="3"></textarea></label>
+		<button class="btn btn-primary" type="submit">Xác nhận đặt hàng</button>
+	</form>
+	<aside class="cart-summary">
+		<p class="eyebrow"><%= isBuyNow ? 'MUA NGAY' : 'TỔNG ĐƠN' %></p>
+		<% cart.forEach((item) => { %>
+			<p class="summary-line"><span><%= item.name %> x <%= item.quantity %></span><strong><%= (item.price * item.quantity).toLocaleString('vi-VN') %> đ</strong></p>
+		<% }) %>
+		<div class="summary-total"><span>Tổng cộng</span><strong><%= total.toLocaleString('vi-VN') %> đ</strong></div>
+	</aside>
+</div>
+<% if (isBuyNow) { %>
+	<form class="checkout-cancel" method="post" action="/orders/checkout/cancel-buy-now">
+		<button class="text-button" type="submit">Quay lại giỏ hàng</button>
+	</form>
+<% } %>
 <%- include('../partials/footer') %>

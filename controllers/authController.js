@@ -4,11 +4,11 @@ const UserModel = require('../models/userModel');
 const authController = {
   // ---------- Hiển thị form ----------
   showRegister(req, res) {
-    res.render('auth/register', { title: 'Đăng ký' });
+    res.render('auth/register', { title: 'Đăng ký', authPage: true });
   },
 
   showLogin(req, res) {
-    res.render('auth/login', { title: 'Đăng nhập' });
+    res.render('auth/login', { title: 'Đăng nhập', authPage: true });
   },
 
   // ---------- Xử lý đăng ký ----------
@@ -69,8 +69,14 @@ const authController = {
         email: user.email,
         role: user.role,
       };
+      req.session.cookie.maxAge = req.body.remember
+        ? 1000 * 60 * 60 * 24 * 30
+        : 1000 * 60 * 60 * 24;
 
       req.flash('success', `Chào mừng trở lại, ${user.full_name}!`);
+      const returnTo = req.session.returnTo;
+      delete req.session.returnTo;
+      if (returnTo === '/orders/checkout') return res.redirect(returnTo);
       if (user.role === 'admin') {
         return res.redirect('/admin');
       }

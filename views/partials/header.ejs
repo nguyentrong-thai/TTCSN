@@ -4,29 +4,55 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%= title %></title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" crossorigin="anonymous" referrerpolicy="no-referrer">
   <link rel="stylesheet" href="/css/style.css">
 </head>
-<body>
+<body class="<%= typeof authPage !== 'undefined' && authPage ? 'auth-page' : '' %>">
   <header class="site-header">
-    <div class="container header-inner">
-      <a href="/" class="logo"><span>E</span>lectroShop</a>
-      <nav>
-        <a href="/products">Sản phẩm</a>
-        <a href="/cart">Giỏ hàng <b class="cart-count"><%= cartCount || 0 %></b></a>
-        <% if (currentUser) { %>
-          <a href="/orders">Đơn hàng</a>
-          <% if (currentUser.role === 'admin') { %><a href="/admin">Quản trị</a><% } %>
-          <span class="welcome">Xin chào, <%= currentUser.full_name %></span>
-          <a href="/auth/logout">Đăng xuất</a>
-        <% } else { %>
-          <a href="/auth/login">Đăng nhập</a>
-          <a href="/auth/register">Đăng ký</a>
-        <% } %>
-      </nav>
+    <div class="market-topline">
+      <div class="container market-topline-inner">
+        <span>Nhóm 12 · Thực tập cơ sở ngành</span>
+        <div class="market-topline-links">
+          <a class="market-topline-link" href="<%= currentUser ? '/orders' : '/auth/login' %>" aria-label="Thông báo đơn hàng">
+            <i class="far fa-bell" aria-hidden="true"></i><span>Thông báo</span>
+          </a>
+          <a class="market-topline-link" href="/support">
+            <i class="far fa-question-circle" aria-hidden="true"></i><span>Hỗ trợ</span>
+          </a>
+          <% if (currentUser) { %>
+            <% if (currentUser.role === 'admin') { %><a href="/admin">Quản trị</a><% } %>
+            <span>Xin chào, <%= currentUser.full_name %></span>
+            <a href="/auth/logout" data-confirm-logout>Đăng xuất</a>
+          <% } else { %>
+            <a href="/auth/login">Đăng nhập</a>
+            <a href="/auth/register">Đăng ký</a>
+          <% } %>
+        </div>
+      </div>
     </div>
+    <div class="container market-header-main">
+      <a href="/" class="logo" aria-label="Group 12 - Trang chủ">GROUP <strong>12</strong></a>
+      <form class="market-search" method="get" action="/products" role="search">
+        <label class="visually-hidden" for="site-search">Tìm sản phẩm</label>
+        <input id="site-search" type="search" name="search" placeholder="Nhập sản phẩm cần tìm">
+        <button type="submit" aria-label="Tìm kiếm"><i class="fas fa-search" aria-hidden="true"></i><span class="visually-hidden">Tìm kiếm</span></button>
+      </form>
+      <a class="market-cart" href="/cart" aria-label="Giỏ hàng, <%= cartCount || 0 %> sản phẩm">
+        <i class="fas fa-shopping-cart market-cart-icon" aria-hidden="true"></i>
+        <span>Giỏ hàng</span>
+        <b class="cart-count"><%= cartCount || 0 %></b>
+      </a>
+    </div>
+    <nav class="market-nav">
+      <div class="container market-nav-inner">
+        <a href="/">Trang chủ</a>
+        <a href="/products">Tất cả sản phẩm</a>
+        <% if (currentUser) { %><a href="/orders">Đơn mua</a><% } %>
+      </div>
+    </nav>
   </header>
 
-  <main class="container">
+  <main class="container <%= typeof marketHome !== 'undefined' && marketHome ? 'market-home' : '' %> <%= typeof authPage !== 'undefined' && authPage ? 'auth-shell' : '' %>">
     <% if (success && success.length) { %>
       <div class="alert alert-success"><%= success[0] %></div>
     <% } %>

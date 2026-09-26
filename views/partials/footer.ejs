@@ -1,10 +1,25 @@
   </main>
 
-  <footer class="site-footer">
+  <footer class="site-footer market-footer">
     <div class="container">
-      <div><a class="logo footer-logo" href="/"><span>E</span>lectroShop</a><p>Thiết bị tốt hơn cho nhịp sống số.</p></div>
-      <p>&copy; <%= new Date().getFullYear() %> ElectroShop</p>
+      <div class="market-footer-about">
+        <a class="logo footer-logo" href="/">GROUP <strong>12</strong></a>
+        <p>Website bán đồ điện tử của nhóm 12, học phần Thực tập cơ sở ngành.</p>
+      </div>
+      <div class="market-footer-links">
+        <strong>Mua sắm</strong>
+        <a href="/products">Tất cả sản phẩm</a>
+        <a href="/cart">Giỏ hàng</a>
+      </div>
+      <div class="market-footer-links">
+        <strong>Tài khoản</strong>
+        <a href="/auth/login">Đăng nhập</a>
+        <a href="/orders">Đơn mua</a>
+        <a href="/support">Trung tâm hỗ trợ</a>
+      </div>
+      <p class="market-copyright">&copy; <%= new Date().getFullYear() %> Group 12</p>
     </div>
   </footer>
+  <script src="/js/site.js" defer></script>
 </body>
 </html>

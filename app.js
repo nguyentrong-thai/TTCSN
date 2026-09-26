@@ -46,6 +46,9 @@ app.use('/products', require('./routes/productRoutes'));
 app.use('/cart', require('./routes/cartRoutes'));
 app.use('/orders', require('./routes/orderRoutes'));
 app.use('/admin', require('./routes/adminRoutes'));
+app.get('/support', (req, res) => {
+  res.render('support', { title: 'Trung tâm hỗ trợ - ElectroShop' });
+});
 
 // ---------- 404 ----------
 app.use((req, res) => {

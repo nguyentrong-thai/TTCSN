@@ -9,18 +9,26 @@ function getCart(req) { return req.session.cart || []; }
 
 router.get('/checkout', async (req, res, next) => {
   try {
-    const cart = getCart(req);
+    const buyNowItem = req.session.buyNow;
+    const cart = buyNowItem ? [buyNowItem] : getCart(req);
     if (!cart.length) { req.flash('error', 'Giỏ hàng đang trống.'); return res.redirect('/cart'); }
     const user = await UserModel.findById(req.session.user.id);
     const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    res.render('orders/checkout', { title: 'Thanh toán - ElectroShop', cart, total, user });
+    res.render('orders/checkout', { title: 'Thanh toán - ElectroShop', cart, total, user, isBuyNow: Boolean(buyNowItem) });
   } catch (err) { next(err); }
+});
+
+router.post('/checkout/cancel-buy-now', (req, res) => {
+  delete req.session.buyNow;
+  delete req.session.returnTo;
+  res.redirect('/cart');
 });
 
 router.post('/', async (req, res, next) => {
   let connection;
   try {
-    const cart = getCart(req);
+    const buyNowItem = req.session.buyNow;
+    const cart = buyNowItem ? [buyNowItem] : getCart(req);
     const { shipping_address, shipping_phone, note } = req.body;
     if (!cart.length || !shipping_address || !shipping_phone) {
       req.flash('error', 'Vui lòng nhập địa chỉ và số điện thoại giao hàng.');
@@ -45,7 +53,9 @@ router.post('/', async (req, res, next) => {
       await connection.query('UPDATE products SET stock_qty = stock_qty - ? WHERE id = ?', [item.quantity, item.id]);
     }
     await connection.commit();
-    req.session.cart = [];
+    if (buyNowItem) delete req.session.buyNow;
+    else req.session.cart = [];
+    delete req.session.returnTo;
     req.flash('success', `Đặt hàng thành công. Mã đơn #${orderResult.insertId}.`);
     res.redirect('/orders');
   } catch (err) {
