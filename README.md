@@ -28,6 +28,8 @@ Website bán đồ điện tử phục vụ bài tập lớn, xây dựng bằng
 - Giỏ hàng theo session
 - Đặt hàng, hủy đơn khi còn ở trạng thái chờ xác nhận
 - Quản trị danh mục, sản phẩm, đơn hàng
+- Phân trang danh sách sản phẩm, đơn hàng và lịch sử mua hàng
+- Xem và cập nhật thông tin cá nhân
 - Wishlist theo tài khoản
 - Chatbot tư vấn sản phẩm đơn giản
 - Giao diện responsive
@@ -120,6 +122,7 @@ Nếu gặp `EADDRINUSE` trên cổng 3000, app khác hoặc một instance Elec
 - [ ] Hủy đơn ở trạng thái chờ xác nhận
 - [ ] Đánh giá sản phẩm sau khi hoàn tất đơn hàng
 - [ ] Admin quản trị danh mục/sản phẩm/đơn hàng
+- [ ] Xem và cập nhật thông tin cá nhân
 
 ### Lưu ý thực tế
 
@@ -150,7 +153,6 @@ README.md       Hướng dẫn dự án
 
 ## Hạng mục chưa hoàn thiện
 
-- Phân trang sản phẩm / đơn hàng
 - Thanh toán online (VNPay/Momo sandbox)
 - Thống kê doanh thu dạng biểu đồ
 - Tự động hóa kiểm thử
