@@ -1,61 +1,153 @@
-# ElectroShop
+# ElectroShop - Hệ thống thương mại điện tử
 
-Website bán đồ điện tử phục vụ bài tập lớn, xây dựng bằng Node.js, Express, EJS và MySQL.
+## 1. Giới thiệu dự án
 
-## Tình trạng hiện tại
+ElectroShop là một hệ thống thương mại điện tử mô phỏng thực tế, được xây dựng trên nền tảng Node.js và MySQL, phục vụ mục tiêu học tập và nghiên cứu trong lĩnh vực phát triển ứng dụng web. Dự án tập trung vào việc triển khai các chức năng cơ bản của một cửa hàng trực tuyến như đăng ký, đăng nhập, quản lý sản phẩm, giỏ hàng, đặt hàng, theo dõi đơn hàng và quản trị hệ thống.
 
-- App đã khởi động đúng và render các trang chính như homepage, login và danh mục sản phẩm.
-- Các luồng dữ liệu như đăng nhập, đăng ký, giỏ hàng, đặt hàng, admin quản lý yêu cầu MySQL đang chạy và database `electro_shop` đã được import đúng `schema.sql`.
-- Nếu MySQL chưa được khởi động hoặc schema chưa được import, app có thể chạy nhưng các flow phụ thuộc DB sẽ không hoạt động đúng.
+Mục tiêu của dự án là xây dựng một ứng dụng web có cấu trúc rõ ràng, dễ mở rộng và phù hợp để trình bày trong báo cáo đồ án môn học, đồng thời đáp ứng các yêu cầu nghiệp vụ của một hệ thống bán hàng trực tuyến hiện đại.
 
-## Công nghệ chính
+---
+
+## 2. Mục tiêu và phạm vi
+
+### 2.1 Mục tiêu chính
+
+- Xây dựng hệ thống bán hàng trực tuyến có giao diện thân thiện
+- Hỗ trợ người dùng tìm kiếm, lựa chọn và đặt mua sản phẩm
+- Cung cấp chức năng quản lý đơn hàng và người dùng cho admin
+- Tạo nền tảng để mở rộng thêm các tính năng như thanh toán online, báo cáo thống kê, email và phân tích dữ liệu
+
+### 2.2 Phạm vi chức năng
+
+- Quản lý tài khoản người dùng
+- Đăng ký, đăng nhập, phân quyền người dùng/admin
+- Hiển thị sản phẩm theo danh mục
+- Tìm kiếm và lọc sản phẩm
+- Giỏ hàng và đặt hàng
+- Theo dõi trạng thái đơn hàng
+- Quản trị sản phẩm, danh mục và đơn hàng
+- Đánh giá sản phẩm sau khi hoàn tất đơn hàng
+- Wishlist cho người dùng
+
+---
+
+## 3. Công cụ và công nghệ sử dụng
+
+### 3.1 Frontend
+
+- HTML, CSS, JavaScript
+- EJS (Embedded JavaScript Templates)
+- Bootstrap / CSS tùy chỉnh
+
+### 3.2 Backend
+
+- Node.js
+- Express.js
+- MVC pattern
+
+### 3.3 Database
+
+- MySQL
+- XAMPP / phpMyAdmin để quản lý database cục bộ
+
+### 3.4 Bảo mật và xử lý nghiệp vụ
+
+- bcrypt: mã hóa mật khẩu
+- express-session: quản lý session người dùng
+- helmet: bảo vệ ứng dụng khỏi các lỗ hổng cơ bản
+- csrf: bảo mật form
+- express-rate-limit: giới hạn tần suất request
+- multer / xử lý hình ảnh nếu có dùng upload sản phẩm
+
+### 3.5 Quản lý dự án và triển khai
+
+- Git + GitHub: quản lý mã nguồn và lưu trữ dự án
+- npm: quản lý package và chạy project
+- Visual Studio Code: môi trường phát triển
+- XAMPP + MySQL: cơ sở dữ liệu local cho phát triển
+- Render / Railway: triển khai ứng dụng lên môi trường production
+
+> Các công cụ thực sự đang được sử dụng trong dự án bao gồm: GitHub, VS Code, MySQL, XAMPP, npm và Railway/Render cho triển khai.
+
+---
+
+## 4. Các use case chính của hệ thống
+
+### 4.1 Use case người dùng
+
+- Đăng ký tài khoản mới
+- Đăng nhập hệ thống
+- Xem danh sách sản phẩm và chi tiết sản phẩm
+- Tìm kiếm và lọc sản phẩm theo tiêu chí
+- Thêm sản phẩm vào giỏ hàng
+- Cập nhật số lượng và xóa sản phẩm trong giỏ hàng
+- Thanh toán và đặt hàng
+- Theo dõi trạng thái đơn hàng
+- Thêm sản phẩm vào wishlist
+- Viết đánh giá sản phẩm sau khi đơn hàng hoàn tất
+
+### 4.2 Use case quản trị viên
+
+- Đăng nhập với quyền admin
+- Quản lý danh mục sản phẩm
+- Thêm, sửa, xóa sản phẩm
+- Quản lý thông tin người dùng
+- Xem và xử lý đơn hàng
+- Cập nhật trạng thái đơn hàng
+- Theo dõi hoạt động và dữ liệu hệ thống
+
+---
+
+## 5. Cấu trúc dự án
+
+```text
+ElectroShop/
+├── app.js                  # File khởi động ứng dụng
+├── package.json            # Thông tin project và dependency
+├── .env.example            # Mẫu biến môi trường
+├── config/                 # Cấu hình hệ thống, database, môi trường
+├── controllers/            # Xử lý logic nghiệp vụ
+├── models/                 # Các model truy vấn dữ liệu
+├── routes/                 # Định tuyến request
+├── views/                  # Giao diện EJS
+├── public/                 # File tĩnh: CSS, JS, hình ảnh
+├── middlewares/            # Middleware xác thực và phân quyền
+├── database/               # Schema SQL và migration
+├── README.md               # Tài liệu dự án
+└── ...
+```
+
+---
+
+## 6. Yêu cầu môi trường
 
 - Node.js 18+
-- Express.js
-- EJS
-- MySQL/MariaDB
-- `mysql2/promise`
-- `express-session`, `connect-flash`, `bcrypt`
-- `multer`, `sharp`
-- `csurf`, `helmet`, `express-rate-limit`
-
-## Tính năng đã triển khai
-
-- Đăng ký / đăng nhập / đăng xuất
-- Phân quyền người dùng và admin
-- Trang chủ, danh mục, tìm kiếm và lọc sản phẩm
-- Chi tiết sản phẩm, đánh giá và bình luận
-- Giỏ hàng theo session
-- Đặt hàng, hủy đơn khi còn ở trạng thái chờ xác nhận
-- Quản trị danh mục, sản phẩm, đơn hàng
-- Phân trang danh sách sản phẩm, đơn hàng và lịch sử mua hàng
-- Xem và cập nhật thông tin cá nhân
-- Wishlist theo tài khoản
-- Chatbot tư vấn sản phẩm đơn giản
-- Giao diện responsive
-
-## Yêu cầu môi trường
-
-- Node.js 18 trở lên
+- MySQL hoặc MariaDB
+- XAMPP / Laragon / MySQL Server
 - npm
-- MySQL hoặc MariaDB đang chạy
-- XAMPP hoặc Laragon đều được dùng
+- Git
 
-## Hướng dẫn cài đặt và chạy
+---
 
-### 1. Cài đặt dependency
+## 7. Hướng dẫn chạy dự án ở local
 
-```powershell
+### Bước 1: Cài đặt dependency
+
+```bash
 npm install
 ```
 
-### 2. Tạo file môi trường
+### Bước 2: Tạo file môi trường
 
-```powershell
-Copy-Item .env.example .env
+Tạo file `.env` từ `.env.example`:
+
+```bash
+copy .env.example .env
 ```
 
-Kiểm tra file `.env`:
+### Bước 3: Cấu hình database
+
+File `.env` có dạng như sau:
 
 ```env
 NODE_ENV=development
@@ -65,102 +157,85 @@ DB_PORT=3306
 DB_USER=root
 DB_PASSWORD=
 DB_NAME=electro_shop
-SESSION_SECRET=chuoi_bi_mat_cua_ban
+SESSION_SECRET=your_secret_key_here
 ```
 
-### 3. Khởi động MySQL và import schema
+### Bước 4: Khởi động MySQL
 
-Bước bắt buộc để chạy hết các chức năng có dữ liệu.
+- Mở XAMPP hoặc MySQL Server
+- Khởi động Apache và MySQL
+- Import file `database/schema.sql` vào database `electro_shop`
 
-1. Mở XAMPP Control Panel
-2. Start MySQL
-3. Vào `http://localhost/phpmyadmin`
-4. Tạo database `electro_shop`
-5. Import `database/schema.sql`
+### Bước 5: Chạy ứng dụng
 
-> Nếu database đã tồn tại, hãy backup trước khi import lại. Nếu cần thêm dữ liệu đánh giá/wishlist từ phiên bản cũ, chạy thêm `database/migration-reviews-wishlist.sql`.
-
-### 4. Chạy ứng dụng
-
-```powershell
+```bash
 npm run dev
 ```
 
-Mở:
+### Bước 6: Truy cập ứng dụng
+
+Mở trình duyệt và truy cập:
 
 ```text
 http://localhost:3000
 ```
 
-### 5. Tài khoản admin mẫu
+### Tài khoản admin mẫu
 
 ```text
 Email: admin@electroshop.vn
 Mật khẩu: ElectroShop@2026!
 ```
 
-> Chỉ dùng cho môi trường local. Nên đổi mật khẩu trước khi demo hoặc deploy thật.
+> Lưu ý: nên thay đổi mật khẩu admin trước khi demo hoặc triển khai lên môi trường production.
 
-Nếu tài khoản admin đã tồn tại từ lần cài đặt trước và mật khẩu mẫu không đăng nhập được, bản ghi trong database có thể đang giữ hash cũ. Cập nhật lại `password_hash` bằng hash bcrypt mới cho `admin@electroshop.vn`; import lại `schema.sql` không tự cập nhật bản ghi đã tồn tại.
+---
 
-Nếu gặp `EADDRINUSE` trên cổng 3000, app khác hoặc một instance ElectroShop khác đang sử dụng cổng đó. Dùng instance đang chạy hoặc đổi `PORT` trong `.env` sang cổng còn trống.
+## 8. Triển khai trên Render
 
-## Kiểm tra luồng người dùng
+1. Push source code lên GitHub
+2. Tạo database MySQL trên Render hoặc sử dụng dịch vụ DB tương thích
+3. Tạo Web Service trên Render và kết nối repo GitHub
+4. Thêm biến môi trường theo mẫu:
 
-### Luồng đã xác minh
-
-- [x] Trang chủ render thành công
-- [x] Trang đăng nhập render thành công
-- [x] Đăng nhập admin và mở dashboard thành công trên database local
-- [x] Danh sách và chi tiết sản phẩm hiển thị ảnh trên database local
-- [x] Mở trang yêu thích sau khi đăng nhập
-- [ ] Đăng ký tài khoản mới sau khi MySQL đang chạy
-- [ ] Đăng nhập tài khoản khách hàng
-- [ ] Thêm sản phẩm vào giỏ hàng
-- [ ] Cập nhật số lượng trong giỏ hàng
-- [ ] Đặt hàng và xem đơn hàng
-- [ ] Hủy đơn ở trạng thái chờ xác nhận
-- [ ] Đánh giá sản phẩm sau khi hoàn tất đơn hàng
-- [ ] Admin quản trị danh mục/sản phẩm/đơn hàng
-- [ ] Xem và cập nhật thông tin cá nhân
-
-### Lưu ý thực tế
-
-Khi MySQL chưa chạy hoặc schema chưa được import:
-
-- login trả về “Email hoặc mật khẩu không đúng.”
-- các flow phụ thuộc database sẽ không hoạt động
-- app vẫn có thể boot nhưng không có dữ liệu người dùng/sản phẩm để test
-
-Database cũ chưa có bảng `wishlist_items` có thể khiến trang chi tiết sản phẩm và wishlist lỗi khi đăng nhập. Tạo bảng này theo định nghĩa trong `database/migration-reviews-wishlist.sql`; không cần import lại toàn bộ `schema.sql`.
-
-Tài khoản admin mẫu, danh sách/chi tiết sản phẩm và trang wishlist đã được kiểm tra trên database local. Các luồng đăng ký, thêm giỏ, checkout và xử lý đơn hàng chưa được xác minh end-to-end.
-
-## Cấu trúc thư mục
-
-```text
-config/         Cấu hình DB và môi trường
-controllers/    Logic nghiệp vụ
-database/       Schema SQL và dữ liệu mẫu
-middlewares/    Middleware auth, quyền, bảo mật
-models/         Query dữ liệu
-public/         CSS, JS, ảnh tĩnh
-routes/         Định tuyến Express
-views/          Templates EJS
-app.js          Khởi tạo server
-README.md       Hướng dẫn dự án
+```env
+NODE_ENV=production
+PORT=10000
+DB_HOST=your_db_host
+DB_PORT=3306
+DB_USER=your_db_user
+DB_PASSWORD=your_db_password
+DB_NAME=electro_shop
+SESSION_SECRET=your_strong_secret
 ```
 
-## Hạng mục chưa hoàn thiện
+5. Import `database/schema.sql` vào database online
+6. Khởi động service và kiểm tra các chức năng chính
 
-- Thanh toán online (VNPay/Momo sandbox)
-- Thống kê doanh thu dạng biểu đồ
-- Tự động hóa kiểm thử
-- Deploy production và báo cáo bảo vệ
+---
 
-## Lưu ý quan trọng
+## 9. Triển khai trên Railway
 
-- Giỏ hàng hiện đang lưu trong session, không đồng bộ giữa các thiết bị.
-- Dự án đang tập trung vào phương án Express + EJS + MySQL theo đúng đề tài đồ án.
-- Chưa có CI/CD hay test suite tự động trong package.json.
+1. Push source code lên GitHub.
+2. Tạo project mới trên Railway.
+3. Kết nối repository từ GitHub.
+4. Cấu hình biến môi trường cho production.
+5. Tạo database MySQL và import file `database/schema.sql`.
+6. Khởi động ứng dụng và kiểm tra lại các chức năng chính.
+
+---
+
+## 10. Kết luận
+
+ElectroShop là một dự án phát triển web có tính thực tiễn cao, phù hợp để mô phỏng hoạt động của một cửa hàng điện tử trong môi trường học tập. Dự án không chỉ bao gồm các chức năng cơ bản của bán hàng trực tuyến mà còn thể hiện khả năng triển khai hệ thống theo hướng MVC, quản lý cơ sở dữ liệu, xử lý xác thực người dùng và bảo mật ứng dụng. Với cấu trúc rõ ràng và khả năng mở rộng tốt, dự án này đáp ứng yêu cầu của một bài tập lớn hoặc đồ án môn học về phát triển ứng dụng web.
+
+---
+
+## 11. Ghi chú
+
+- Không commit file `.env` lên GitHub
+- Nên dùng biến môi trường riêng cho môi trường production
+- Trước khi demo, kiểm tra lại kết nối database và trạng thái đơn hàng
+- Nếu database chưa được import schema, các chức năng chính sẽ không hoạt động đúng
+
 
