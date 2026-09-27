@@ -23,7 +23,7 @@ body.admin-page main.container { max-width:none; min-height:100vh; margin-left:2
 .admin-side-brand { display:block; padding:20px 16px 40px; color:#fff; font-size:13px; font-weight:700; }
 .admin-side-nav nav { display:block; width:100%; }
 .admin-side-nav nav a { display:block; padding:16px; color:#fff; font-size:13px; white-space:nowrap; }
-.admin-side-nav nav a:hover, .admin-side-nav nav a.is-active { background:#fff; color:#b52824; border-radius:0 18px 18px 0; }
+.admin-side-nav nav a:hover, .admin-side-nav nav a.is-active { width:100%; background:#fff; color:#b52824; border-radius:0; }
 .admin-topbar { position:fixed; top:0; right:0; left:220px; z-index:20; height:58px; display:flex; align-items:center; justify-content:center; background:#f4f5f8; }
 .admin-topbar-search { position:relative; width:240px; }
 .admin-topbar-search span { position:absolute; left:10px; top:4px; font-size:18px; }
@@ -35,6 +35,7 @@ body.admin-page .page-heading .eyebrow { font-size:11px; }
 body.admin-page .alert { max-width:100%; margin:0 0 18px; }
 body.admin-page .admin-panel, body.admin-page .admin-form, body.admin-page .admin-table, body.admin-page .admin-stats article { border-radius:10px; }
 body.admin-page .section-row { margin:0 0 18px; }
+body.admin-page .section-row > .btn-primary { color:var(--ink); }
 body.admin-page .admin-actions { margin-bottom:20px; }
 .admin-inline-search { margin-left:auto; }
 .admin-inline-search input { min-width:220px; height:42px; border-radius:4px; }

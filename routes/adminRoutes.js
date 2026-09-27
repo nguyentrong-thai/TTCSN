@@ -228,7 +228,7 @@ router.post('/products', upload.single('image'), async (req, res, next) => {
       [product.categoryId, product.name, brand || null, description || null, product.price, product.stockQuantity, imageUrl || getImageUrl(image_url)]
     );
     req.flash('success', 'Đã thêm sản phẩm.');
-    res.redirect('/admin');
+    res.redirect('/admin/products');
   } catch (err) { next(err); }
 });
 
