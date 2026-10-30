@@ -121,6 +121,7 @@ $env:ADMIN_PASSWORD = "your-unique-password-at-least-8-characters"
 npm run admin:create
 Remove-Item Env:ADMIN_PASSWORD
 ```
+Nếu dùng terminal
 ```powershell
 thay $env: bằng set:
 ví dụ: $env:DB_SSL = "true" => set DB_SSL = "true"
