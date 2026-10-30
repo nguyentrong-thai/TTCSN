@@ -123,8 +123,8 @@ Remove-Item Env:ADMIN_PASSWORD
 ```
 Nếu dùng terminal
 ```powershell
-thay $env: bằng set:
-ví dụ: $env:DB_SSL = "true" => set DB_SSL = "true"
+thay "$env:" bằng "set  " và dấu " tại các biến môi trường":
+ví dụ: $env:DB_PORT = "4000" => set "DB_PORT=4000"
 ```
 
 Không dùng `database/schema.local.sql` trên dịch vụ. Database user cần quyền tạo bảng cho session store. Admin phải tạo riêng cho từng database production.
