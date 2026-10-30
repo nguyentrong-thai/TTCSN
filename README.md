@@ -90,7 +90,7 @@ npm test
 ## Deploy Render + TiDB Cloud
 
 1. Tạo database `electro_shop` trên TiDB Cloud.
-2. Import **`database/schema.sql`** một lần vào database rỗng bằng giao diện quản lý DB hoặc `npm run db:import` khi các biến `DB_*` trỏ tới TiDB. Đây là schema dịch vụ; không có admin mẫu.
+2. Import **`database/schema.sql`** một lần vào database rỗng bằng giao diện quản lý DB hoặc `npm run db:import` khi các biến `DB_*` trỏ tới TiDB. Đây là schema dịch vụ; không có admin mẫu. ( hoặc viết code chạy thẳng SQL Edittor )
 3. Tạo Render Web Service từ repository. Build command: `npm install`; Start command: `npm start`.
 4. Thêm các biến sau trong Render **Environment**:
 ```env
@@ -120,6 +120,10 @@ $env:ADMIN_EMAIL = "your-admin@example.com"
 $env:ADMIN_PASSWORD = "your-unique-password-at-least-8-characters"
 npm run admin:create
 Remove-Item Env:ADMIN_PASSWORD
+```
+```powershell
+thay $env: bằng set:
+ví dụ: $env:DB_SSL = "true" => set DB_SSL = "true"
 ```
 
 Không dùng `database/schema.local.sql` trên dịch vụ. Database user cần quyền tạo bảng cho session store. Admin phải tạo riêng cho từng database production.
