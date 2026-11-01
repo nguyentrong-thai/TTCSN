@@ -2,7 +2,7 @@
 <section class="page-heading">
   <p class="eyebrow">CHI TIẾT ĐƠN HÀNG</p>
   <h1>Đơn hàng #<%= order.id %></h1>
-  <p class="muted"><%= new Date(order.created_at).toLocaleString('vi-VN') %></p>
+  <p class="muted"><%= formatDateTime(order.created_at) %></p>
 </section>
 
 <div class="section-row">

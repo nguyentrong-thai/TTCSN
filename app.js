@@ -16,8 +16,10 @@ const indexRoutes = require('./routes/index');
 const profileRoutes = require('./routes/profileRoutes');
 const CartModel = require('./models/cartModel');
 const uploadDirectory = require('./config/uploadStorage');
+const { formatDateTime } = require('./utils/dateTime');
 
 const app = express();
+app.locals.formatDateTime = formatDateTime;
 const sessionSecret = process.env.SESSION_SECRET;
 
 if (!sessionSecret) {

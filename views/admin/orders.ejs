@@ -9,7 +9,7 @@
           <strong>#<%= order.id %> · <%= order.full_name %></strong>
           <a class="btn order-detail-button" href="/admin/orders/<%= order.id %>">Xem chi tiết</a>
         </div>
-        <small><%= order.email %> · <%= new Date(order.created_at).toLocaleString('vi-VN') %> · <%= Number(order.total_amount).toLocaleString('vi-VN') %> đ</small>
+        <small><%= order.email %> · <%= formatDateTime(order.created_at) %> · <%= Number(order.total_amount).toLocaleString('vi-VN') %> đ</small>
       </div>
       <div class="order-actions">
         <% if (order.allowedTransitions.length) { %>

@@ -2,7 +2,7 @@
 <section class="page-heading">
   <p class="eyebrow">QUẢN LÝ ĐƠN HÀNG</p>
   <h1>Chi tiết đơn hàng #<%= order.id %></h1>
-  <p class="muted">Đặt lúc <%= new Date(order.created_at).toLocaleString('vi-VN') %></p>
+  <p class="muted">Đặt lúc <%= formatDateTime(order.created_at) %></p>
 </section>
 <div class="admin-order-detail">
   <section class="admin-panel admin-order-card">
